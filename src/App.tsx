@@ -9,6 +9,9 @@ import { DishDetailModal } from './components/menu/DishDetailModal';
 import { CartDrawer } from './components/menu/CartDrawer';
 import { FloatingBar } from './components/layout/FloatingBar';
 import { AdminLogin } from './components/admin/AdminLogin';
+import { AdminSidebar, type AdminSection } from './components/admin/AdminSidebar';
+import { KitchenDisplaySystem } from './components/admin/KitchenDisplaySystem';
+import { QrGenerator } from './components/admin/QrGenerator';
 import { DishTable } from './components/admin/DishTable';
 import { DishEditModal } from './components/admin/DishEditModal';
 import { Button } from './components/ui/Button';
@@ -23,10 +26,13 @@ export default function App() {
 
   const { isAuthenticated, signIn, signOut } = useAuth();
 
-  // Detección de ruta secreta: solo si la URL es /admin o /admin/
+  // Detección de ruta secreta: solo si la URL es /admin
   const [isAdminRoute, setIsAdminRoute] = useState(() => {
     return window.location.pathname.startsWith('/admin');
   });
+
+  // Sección activa dentro del panel Admin
+  const [adminSection, setAdminSection] = useState<AdminSection>('cocina');
 
   // Queries directas desde Supabase
   const { data: dbCategories = [], isLoading: isLoadingCategories } = useCategories();
@@ -44,7 +50,6 @@ export default function App() {
   useEffect(() => {
     syncTableFromUrl();
 
-    // Escuchar cambios de historial en el navegador
     const handlePopState = () => {
       setIsAdminRoute(window.location.pathname.startsWith('/admin'));
     };
@@ -52,14 +57,12 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [syncTableFromUrl]);
 
-  // Seleccionar la primera categoría que llegue de la base de datos
   useEffect(() => {
     if (dbCategories.length > 0 && !selectedCategory) {
       setSelectedCategory(dbCategories[0].id);
     }
   }, [dbCategories, selectedCategory]);
 
-  // Filtrado de comensales (solo platos disponibles)
   const availableDishes = dbDishes.filter((d) => d.isAvailable);
   const currentCategoryDishes = selectedCategory
     ? availableDishes.filter((d) => d.categoryId === selectedCategory)
@@ -85,66 +88,73 @@ export default function App() {
   };
 
   // ========================================================
-  // RUTA PRIVADA: /admin (TOTALMENTE OCULTA PARA COMENSALES)
+  // RUTA PRIVADA: /admin (DESKTOP PANEL COMPLETO)
   // ========================================================
   if (isAdminRoute) {
+    if (!isAuthenticated) {
+      return (
+        <div className="min-h-screen bg-[#FBFBF9] dot-pattern flex flex-col justify-center p-4">
+          <div className="mb-4 text-center">
+            <button
+              onClick={() => navigateTo('/')}
+              className="text-xs text-gray-500 hover:text-gray-900 font-semibold"
+            >
+              ← Volver al Menú de Comensales
+            </button>
+          </div>
+          <AdminLogin
+            onLogin={async (email, pass) => {
+              await signIn(email, pass);
+            }}
+          />
+        </div>
+      );
+    }
+
     return (
-      <div className="min-h-screen bg-gray-50 text-gray-900 p-4">
-        <main className="max-w-4xl mx-auto py-8">
-          {!isAuthenticated ? (
-            <div>
-              <div className="mb-4 text-center">
-                <button
-                  onClick={() => navigateTo('/')}
-                  className="text-xs text-gray-500 hover:text-gray-800 underline"
-                >
-                  ← Volver al Menú de Clientes
-                </button>
-              </div>
-              <AdminLogin
-                onLogin={async (email, pass) => {
-                  await signIn(email, pass);
-                }}
-              />
-            </div>
-          ) : (
+      <div className="min-h-screen bg-[#FBFBF9] dot-pattern flex">
+        {/* Barra Lateral Izquierda Fija idéntica a la captura */}
+        <AdminSidebar
+          currentSection={adminSection}
+          onSelectSection={setAdminSection}
+          onGoToRestaurant={() => navigateTo('/')}
+          onLogout={() => signOut()}
+        />
+
+        {/* Contenido Principal del Módulo Seleccionado */}
+        <main className="flex-1 p-8 overflow-y-auto max-h-screen">
+          {/* Módulo 1: COCINA (KDS) */}
+          {adminSection === 'cocina' && <KitchenDisplaySystem />}
+
+          {/* Módulo 2: MI CARTA (GESTIÓN DE PLATOS SUPABASE) */}
+          {adminSection === 'carta' && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
                 <div>
-                  <h1 className="font-serif text-2xl sm:text-3xl font-bold text-gray-900">
-                    Administración de Menú
-                  </h1>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1">
+                    CARTA DEL RESTAURANTE
+                  </span>
+                  <h2 className="font-serif text-3xl font-bold text-gray-900">
+                    Platillos y Categorías
+                  </h2>
                   <p className="text-xs text-gray-500 mt-1">
                     Conectado en vivo a Supabase ({dbDishes.length} platillos en BD)
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigateTo('/')}
-                  >
-                    Ver Menú Cliente
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="bg-[#1C3F32] hover:bg-[#142e25] text-white"
-                    onClick={() => {
-                      setEditingDish(null);
-                      setIsEditModalOpen(true);
-                    }}
-                  >
-                    + Nuevo Platillo
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => signOut()}>
-                    Cerrar Sesión
-                  </Button>
-                </div>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="bg-[#1C3F32] hover:bg-[#142e25] text-white"
+                  onClick={() => {
+                    setEditingDish(null);
+                    setIsEditModalOpen(true);
+                  }}
+                >
+                  + Nuevo Platillo
+                </Button>
               </div>
 
-              {/* Tabla de Platos sincronizada con Supabase */}
               <DishTable
                 dishes={dbDishes}
                 categories={dbCategories}
@@ -156,7 +166,6 @@ export default function App() {
                 onToggleAvailability={handleToggleAvailability}
               />
 
-              {/* Modal de Creación / Edición */}
               <DishEditModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
@@ -168,6 +177,23 @@ export default function App() {
                   setIsEditModalOpen(false);
                 }}
               />
+            </div>
+          )}
+
+          {/* Módulo 3: GENERADOR DE QR */}
+          {adminSection === 'qr' && <QrGenerator />}
+
+          {/* Módulos en preparación */}
+          {['resumen', 'pedidos', 'promociones', 'sugerencias', 'apariencia'].includes(
+            adminSection
+          ) && (
+            <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center space-y-2">
+              <h3 className="font-serif text-2xl font-bold text-gray-900 capitalize">
+                Módulo de {adminSection}
+              </h3>
+              <p className="text-xs text-gray-400 max-w-sm mx-auto">
+                Este módulo está listo para enlazar más reportes o configuraciones visuales.
+              </p>
             </div>
           )}
         </main>
@@ -186,7 +212,6 @@ export default function App() {
         <HomeHero onExplore={scrollToMenu} />
 
         <section id="menu-catalog" className="px-4 pt-4">
-          {/* Barra de Categorías obtenidas de Supabase */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
               {isLoadingCategories ? (
@@ -213,7 +238,6 @@ export default function App() {
               )}
             </div>
 
-            {/* Switch Cuadrícula / Lista */}
             <div className="flex items-center bg-white border border-gray-200 rounded-xl p-0.5 shadow-2xs">
               <button
                 onClick={() => setIsLargeView(false)}
@@ -240,7 +264,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Catálogo de Platillos desde Supabase */}
           {isLoadingDishes ? (
             <div className="py-12 text-center text-xs text-gray-400">
               Cargando menú en vivo desde Supabase...

@@ -37,6 +37,23 @@ export interface TableCartItem {
   dinerId: string;
 }
 
+export type OrderStatus = 'nuevo' | 'en_curso' | 'listo' | 'entregado';
+
+export interface KitchenOrderItem {
+  quantity: number;
+  name: string;
+}
+
+export interface KitchenOrder {
+  id: string;
+  tableNumber: string;
+  status: OrderStatus;
+  items: KitchenOrderItem[];
+  totalCRC: number;
+  totalUSD: number;
+  createdAt: string;
+}
+
 export interface Promotion {
   id: string;
   badge: string;
