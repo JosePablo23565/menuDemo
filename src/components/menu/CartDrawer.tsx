@@ -33,15 +33,12 @@ export const CartDrawer: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
         onClick={() => setIsCartOpen(false)}
       />
 
-      {/* Tarjeta Modal del Carrito idéntica a Imagen 3 */}
       <div className="relative z-10 w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-hidden shadow-2xl flex flex-col dot-pattern">
-        {/* Header con título Pedido en Serif y botón cerrar circular */}
         <div className="p-5 pb-3 flex items-center justify-between border-b border-gray-100 bg-white">
           <h2 className="font-serif text-3xl font-bold text-gray-900 tracking-tight">
             Pedido
@@ -56,18 +53,16 @@ export const CartDrawer: React.FC = () => {
           </button>
         </div>
 
-        {/* Lista de comensales y sus productos */}
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
           {diners.map((diner) => {
             const dinerItems = cart.filter((item) => item.dinerId === diner.id);
             const dinerSubtotal = dinerItems.reduce((acc, item) => {
-              const price = currency === 'COP' ? item.priceCOP : item.priceUSD;
+              const price = currency === 'CRC' ? item.priceCRC : item.priceUSD;
               return acc + price * item.quantity;
             }, 0);
 
             return (
               <div key={diner.id} className="border-b border-gray-100/80 pb-4 last:border-none">
-                {/* Nombre del comensal y badge si no tiene celular */}
                 <div className="flex items-center gap-2 mb-2">
                   <span className="font-bold text-sm text-gray-900">
                     {diner.name}
@@ -86,7 +81,7 @@ export const CartDrawer: React.FC = () => {
                 ) : (
                   <div className="space-y-3">
                     {dinerItems.map((item) => {
-                      const itemPrice = currency === 'COP' ? item.priceCOP : item.priceUSD;
+                      const itemPrice = currency === 'CRC' ? item.priceCRC : item.priceUSD;
                       return (
                         <div
                           key={item.id}
@@ -104,7 +99,6 @@ export const CartDrawer: React.FC = () => {
                               {formatPrice(itemPrice * item.quantity, currency)}
                             </span>
 
-                            {/* Controles [-] [+] en píldora con borde */}
                             <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
                               <button
                                 onClick={() => removeItemQuantity(item.id)}
@@ -125,7 +119,6 @@ export const CartDrawer: React.FC = () => {
                       );
                     })}
 
-                    {/* Subtotal del comensal si tiene productos */}
                     <div className="flex justify-between text-xs text-gray-500 pt-2 border-t border-dashed border-gray-100">
                       <span>Subtotal</span>
                       <span className="font-semibold text-gray-800">
@@ -138,7 +131,6 @@ export const CartDrawer: React.FC = () => {
             );
           })}
 
-          {/* Opción para agregar otro comensal a la mesa */}
           {showAddDiner ? (
             <form onSubmit={handleAddDiner} className="flex gap-2 pt-2">
               <input
@@ -173,7 +165,6 @@ export const CartDrawer: React.FC = () => {
           )}
         </div>
 
-        {/* Footer con Total de la mesa y botón "Enviar pedido" */}
         <div className="p-5 border-t border-gray-100 bg-white space-y-4">
           <div className="flex items-center justify-between">
             <span className="font-bold text-base text-gray-900">Total de la mesa</span>

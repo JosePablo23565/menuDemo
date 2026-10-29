@@ -29,7 +29,7 @@ export const DishTable: React.FC<DishTableProps> = ({
           <tr>
             <th className="px-4 py-3.5">Platillo</th>
             <th className="px-4 py-3.5">Categoría</th>
-            <th className="px-4 py-3.5">Precio (COP)</th>
+            <th className="px-4 py-3.5">Precio (CRC)</th>
             <th className="px-4 py-3.5">Precio (USD)</th>
             <th className="px-4 py-3.5">Estado</th>
             <th className="px-4 py-3.5 text-right">Acciones</th>
@@ -72,7 +72,7 @@ export const DishTable: React.FC<DishTableProps> = ({
                   </span>
                 </td>
                 <td className="px-4 py-3 font-bold text-gray-900">
-                  {formatPrice(dish.priceCOP, 'COP')}
+                  {formatPrice(dish.priceCRC, 'CRC')}
                 </td>
                 <td className="px-4 py-3 font-semibold text-gray-600">
                   {formatPrice(dish.priceUSD, 'USD')}

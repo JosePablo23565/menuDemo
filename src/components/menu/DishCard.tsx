@@ -11,7 +11,7 @@ interface DishCardProps {
 
 export const DishCard: React.FC<DishCardProps> = ({ dish, isLargeView = false, onSelect }) => {
   const { currency, addItemToDiner } = useMenuStore();
-  const currentPrice = currency === 'COP' ? dish.priceCOP : dish.priceUSD;
+  const currentPrice = currency === 'CRC' ? dish.priceCRC : dish.priceUSD;
 
   return (
     <div
@@ -19,7 +19,6 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, isLargeView = false, o
       className="bg-white rounded-3xl border border-gray-100/90 shadow-sm overflow-hidden flex flex-col justify-between cursor-pointer hover:shadow-md transition-all active:scale-[0.99] group"
     >
       <div>
-        {/* Contenedor de Imagen o placeholder de silueta */}
         <div
           className={`w-full bg-[#F3F4F1] relative overflow-hidden flex items-center justify-center ${
             isLargeView ? 'aspect-[4/3]' : 'aspect-square'
@@ -45,7 +44,6 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, isLargeView = false, o
             </div>
           )}
 
-          {/* Badge de Tags como 2x1 si tiene */}
           {dish.tags?.includes('2x1') && (
             <span className="absolute top-2.5 left-2.5 bg-brand-yellow-badge text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
               2×1
@@ -53,7 +51,6 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, isLargeView = false, o
           )}
         </div>
 
-        {/* Textos */}
         <div className="p-3.5">
           <h3 className="font-bold text-gray-900 text-xs sm:text-sm capitalize leading-snug line-clamp-1">
             {dish.name}
@@ -64,13 +61,11 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, isLargeView = false, o
         </div>
       </div>
 
-      {/* Barra de Precio con Estilo Resaltador Amarillo (Foco visual de Imagen 5) */}
       <div className="p-3.5 pt-0 flex items-center justify-between gap-1 mt-auto">
         <span className="inline-block bg-[#FEE575] text-gray-900 font-bold text-xs px-2.5 py-1 rounded-md shadow-xs">
           {formatPrice(currentPrice, currency)}
         </span>
 
-        {/* Botón circular flecha añadir rápido */}
         <button
           onClick={(e) => {
             e.stopPropagation();

@@ -13,19 +13,16 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose 
 
   if (!dish) return null;
 
-  const currentPrice = currency === 'COP' ? dish.priceCOP : dish.priceUSD;
+  const currentPrice = currency === 'CRC' ? dish.priceCRC : dish.priceUSD;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
-      {/* Tarjeta Modal que emula la pantalla completa de la Imagen 2 */}
       <div className="relative z-10 w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col dot-pattern">
-        {/* Header con botón atrás */}
         <div className="p-4 flex items-center justify-between border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
           <button
             onClick={onClose}
@@ -43,12 +40,10 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose 
           <div className="w-9" />
         </div>
 
-        {/* Breadcrumb sutil */}
         <div className="px-5 pt-3 text-[11px] text-gray-400 font-medium">
           Menú / Comidas / <span className="text-gray-700 font-semibold">{dish.name}</span>
         </div>
 
-        {/* Imagen del plato con precio superpuesto */}
         <div className="p-5 pb-3">
           <div className="relative rounded-3xl overflow-hidden bg-gray-100 aspect-[4/3] shadow-inner">
             {dish.imageUrl ? (
@@ -65,7 +60,6 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose 
               </div>
             )}
 
-            {/* Precio superpuesto en fondo oscuro como en Imagen 2 */}
             <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md text-white font-bold text-sm px-3.5 py-1.5 rounded-xl border border-white/10">
               {formatPrice(currentPrice, currency)}
             </div>
@@ -78,7 +72,6 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose 
             </button>
           </div>
 
-          {/* Miniaturas / Selector multimedia (Miniatura + Video) */}
           <div className="flex gap-2.5 mt-3">
             <div className="w-14 h-14 rounded-xl border-2 border-brand-green overflow-hidden bg-gray-100 flex items-center justify-center">
               <span className="text-[10px] text-gray-500 font-bold">1x</span>
@@ -92,7 +85,6 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose 
           </div>
         </div>
 
-        {/* Título y descripción */}
         <div className="px-5 py-2">
           <span className="text-[11px] font-bold text-gray-400 tracking-wider uppercase block mb-1">
             COMIDAS
@@ -105,7 +97,6 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose 
           </p>
         </div>
 
-        {/* Selector de Comensal para la mesa colaborativa */}
         <div className="px-5 py-3 mt-auto">
           <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">
             ¿Para quién es este plato?
@@ -124,7 +115,6 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({ dish, onClose 
           </div>
         </div>
 
-        {/* Footer con Botón verde "Pedido" */}
         <div className="p-4 border-t border-gray-100 bg-white sticky bottom-0">
           <button
             onClick={() => {

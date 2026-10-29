@@ -3,22 +3,18 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Currency, Language, Diner, TableCartItem, Dish } from '../types/database';
 
 interface MenuState {
-  // Preferencias
   currency: Currency;
   language: Language;
   tableNumber: string | null;
 
-  // Comensales de la mesa
   diners: Diner[];
   activeDinerId: string;
 
-  // Carrito / Pedido de la mesa
   cart: TableCartItem[];
   isCartOpen: boolean;
   selectedDish: Dish | null;
   isPromoOpen: boolean;
 
-  // Acciones
   setCurrency: (c: Currency) => void;
   setLanguage: (l: Language) => void;
   setTableNumber: (table: string | null) => void;
@@ -27,14 +23,12 @@ interface MenuState {
   setSelectedDish: (dish: Dish | null) => void;
   setIsPromoOpen: (open: boolean) => void;
 
-  // Acciones de comensales y carrito
   addDiner: (name: string, hasPhone?: boolean) => void;
   addItemToDiner: (dish: Dish, dinerId?: string) => void;
   removeItemQuantity: (itemId: string) => void;
   addItemQuantity: (itemId: string) => void;
   clearCart: () => void;
 
-  // Totales
   getTableTotal: (currency: Currency) => number;
   getDinerTotal: (dinerId: string, currency: Currency) => number;
   getTotalItemsCount: () => number;
@@ -47,12 +41,12 @@ const DEFAULT_DINERS: Diner[] = [
 export const useMenuStore = create<MenuState>()(
   persist(
     (set, get) => ({
-      currency: 'COP',
+      currency: 'CRC', // Por defecto Colones Costarricenses
       language: 'es',
       tableNumber: null,
       diners: DEFAULT_DINERS,
       activeDinerId: 'diner-1',
-      cart: [], // Carrito limpio sin datos quemados
+      cart: [],
       isCartOpen: false,
       selectedDish: null,
       isPromoOpen: false,
@@ -102,7 +96,7 @@ export const useMenuStore = create<MenuState>()(
             id: `item-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
             dishId: dish.id,
             name: dish.name.toUpperCase(),
-            priceCOP: dish.priceCOP,
+            priceCRC: dish.priceCRC,
             priceUSD: dish.priceUSD,
             quantity: 1,
             dinerId: targetDinerId,
@@ -142,7 +136,7 @@ export const useMenuStore = create<MenuState>()(
       getTableTotal: (curr) => {
         const { cart } = get();
         return cart.reduce((acc, item) => {
-          const price = curr === 'COP' ? item.priceCOP : item.priceUSD;
+          const price = curr === 'CRC' ? item.priceCRC : item.priceUSD;
           return acc + price * item.quantity;
         }, 0);
       },
@@ -152,7 +146,7 @@ export const useMenuStore = create<MenuState>()(
         return cart
           .filter((item) => item.dinerId === dinerId)
           .reduce((acc, item) => {
-            const price = curr === 'COP' ? item.priceCOP : item.priceUSD;
+            const price = curr === 'CRC' ? item.priceCRC : item.priceUSD;
             return acc + price * item.quantity;
           }, 0);
       },

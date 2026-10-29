@@ -23,7 +23,7 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    priceCOP: 0,
+    priceCRC: 0,
     priceUSD: 0,
     imageUrl: '',
     categoryId: '',
@@ -35,7 +35,7 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
       setFormData({
         name: dish.name || '',
         description: dish.description || '',
-        priceCOP: dish.priceCOP || 0,
+        priceCRC: dish.priceCRC || 0,
         priceUSD: dish.priceUSD || 0,
         imageUrl: dish.imageUrl || '',
         categoryId: dish.categoryId || (categories[0]?.id ?? ''),
@@ -45,7 +45,7 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
       setFormData({
         name: '',
         description: '',
-        priceCOP: 0,
+        priceCRC: 0,
         priceUSD: 0,
         imageUrl: '',
         categoryId: categories[0]?.id ?? '',
@@ -60,7 +60,7 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
       ...(dish?.id ? { id: dish.id } : {}),
       name: formData.name,
       description: formData.description,
-      priceCOP: Number(formData.priceCOP),
+      priceCRC: Number(formData.priceCRC),
       priceUSD: Number(formData.priceUSD),
       imageUrl: formData.imageUrl,
       categoryId: formData.categoryId,
@@ -83,7 +83,7 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="w-full rounded-2xl border border-gray-200 px-3.5 py-2 text-xs focus:border-brand-green focus:outline-none"
-            placeholder="Ej: Arepa de Queso"
+            placeholder="Ej: Casado Tradicional"
           />
         </div>
 
@@ -99,18 +99,18 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Precio (COP)</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Precio (CRC ₡)</label>
             <input
               type="number"
               required
-              value={formData.priceCOP}
-              onChange={(e) => setFormData({ ...formData, priceCOP: parseFloat(e.target.value) || 0 })}
+              value={formData.priceCRC}
+              onChange={(e) => setFormData({ ...formData, priceCRC: parseFloat(e.target.value) || 0 })}
               className="w-full rounded-2xl border border-gray-200 px-3.5 py-2 text-xs"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Precio (USD)</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Precio (USD $)</label>
             <input
               type="number"
               step="0.01"

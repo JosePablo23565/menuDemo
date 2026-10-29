@@ -7,16 +7,16 @@ export function cn(...inputs: ClassValue[]): string {
 }
 
 /**
- * Formateador de moneda exacto al diseño:
- * COP: COP 99.000 (o COP 21.000)
+ * Formateador de moneda exacto:
+ * CRC: ₡ 4.500 (o CRC 4.500)
  * USD: USD 6.81
  */
 export function formatPrice(amount: number, currency: Currency): string {
-  if (currency === 'COP') {
-    const formatted = new Intl.NumberFormat('es-CO', {
+  if (currency === 'CRC') {
+    const formatted = new Intl.NumberFormat('es-CR', {
       maximumFractionDigits: 0,
     }).format(amount);
-    return `COP ${formatted}`;
+    return `CRC ${formatted}`;
   }
 
   const formatted = new Intl.NumberFormat('en-US', {

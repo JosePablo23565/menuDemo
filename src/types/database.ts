@@ -1,4 +1,4 @@
-export type Currency = 'COP' | 'USD';
+export type Currency = 'CRC' | 'USD';
 export type Language = 'es' | 'en';
 
 export interface Category {
@@ -11,7 +11,7 @@ export interface Dish {
   id: string;
   name: string;
   description: string;
-  priceCOP: number;
+  priceCRC: number;
   priceUSD: number;
   imageUrl?: string;
   videoUrl?: string;
@@ -24,14 +24,14 @@ export interface Diner {
   id: string;
   name: string;
   isSelf?: boolean;
-  hasPhone?: boolean; // ej: "Abuela (sin celular)"
+  hasPhone?: boolean;
 }
 
 export interface TableCartItem {
   id: string;
   dishId: string;
   name: string;
-  priceCOP: number;
+  priceCRC: number;
   priceUSD: number;
   quantity: number;
   dinerId: string;
@@ -47,5 +47,4 @@ export interface Promotion {
   imageUrl?: string;
 }
 
-// Tipo flexible para Supabase cuando se conecte
 export type Database = any;

@@ -2,9 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import type { Category, Dish } from '../types/database';
 
-/**
- * Hook para obtener todas las categorías de Supabase.
- */
 export function useCategories() {
   return useQuery({
     queryKey: ['categories'],
@@ -25,9 +22,6 @@ export function useCategories() {
   });
 }
 
-/**
- * Hook para obtener platos de Supabase, mapeando de snake_case (DB) a camelCase (Frontend).
- */
 export function useDishes(options?: { categoryId?: string; onlyAvailable?: boolean }) {
   const { categoryId, onlyAvailable = true } = options || {};
 
@@ -51,13 +45,12 @@ export function useDishes(options?: { categoryId?: string; onlyAvailable?: boole
         return [];
       }
 
-      // Mapear de las columnas de PostgreSQL al modelo de la app
       return (data || []).map((row: any) => ({
         id: row.id,
         name: row.name,
         description: row.description || '',
-        priceCOP: Number(row.price_cop || 0),
-        priceUSD: Number(row.price_usd || 0),
+        priceCRC: Number(row.price_crc ?? row.price_cop ?? 0),
+        priceUSD: Number(row.price_usd ?? 0),
         imageUrl: row.image_url || '',
         categoryId: row.category_id,
         isAvailable: row.is_available ?? true,
@@ -68,9 +61,6 @@ export function useDishes(options?: { categoryId?: string; onlyAvailable?: boole
   });
 }
 
-/**
- * Hook para crear o actualizar un plato en Supabase (Panel Admin).
- */
 export function useUpsertDish() {
   const queryClient = useQueryClient();
 
@@ -79,7 +69,7 @@ export function useUpsertDish() {
       const dbPayload: any = {
         name: dish.name,
         description: dish.description,
-        price_cop: dish.priceCOP,
+        price_cop: dish.priceCRC, // mapeo compatible
         price_usd: dish.priceUSD,
         image_url: dish.imageUrl,
         category_id: dish.categoryId,
@@ -106,9 +96,6 @@ export function useUpsertDish() {
   });
 }
 
-/**
- * Hook para eliminar un plato de Supabase (Panel Admin).
- */
 export function useDeleteDish() {
   const queryClient = useQueryClient();
 
