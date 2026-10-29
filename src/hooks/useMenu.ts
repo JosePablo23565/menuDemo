@@ -10,7 +10,7 @@ export function useCategories() {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('name', { ascending: true });
+        .order('display_order', { ascending: true }); // Ordenado por display_order
 
       if (error) {
         console.warn('Error al cargar categorías:', error.message);
@@ -112,9 +112,6 @@ export function useDeleteDish() {
   });
 }
 
-/**
- * Hook para enviar comanda desde el carrito móvil a cocina
- */
 export function useCreateOrder() {
   const queryClient = useQueryClient();
 
@@ -146,9 +143,6 @@ export function useCreateOrder() {
   });
 }
 
-/**
- * Hook para obtener y suscribirse en tiempo real a los pedidos de cocina (KDS)
- */
 export function useKitchenOrders() {
   const queryClient = useQueryClient();
 
@@ -196,9 +190,6 @@ export function useKitchenOrders() {
   });
 }
 
-/**
- * Hook para actualizar el estado del pedido en cocina
- */
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
 
@@ -220,9 +211,6 @@ export function useUpdateOrderStatus() {
   });
 }
 
-/**
- * Hook para eliminar/cancelar un pedido de cocina
- */
 export function useDeleteOrder() {
   const queryClient = useQueryClient();
 

@@ -22,6 +22,8 @@ export default function App() {
     syncTableFromUrl,
     selectedDish,
     setSelectedDish,
+    exchangeRate,
+    setExchangeRate,
   } = useMenuStore();
 
   const { isAuthenticated, signIn, signOut } = useAuth();
@@ -59,7 +61,13 @@ export default function App() {
     }
   }, [dbCategories, selectedCategory]);
 
-  const availableDishes = dbDishes.filter((d) => d.isAvailable);
+  // Recalcular USD de cada plato dinámicamente según la tasa activa de la casa
+  const dishesWithCalculatedUSD = dbDishes.map((d) => ({
+    ...d,
+    priceUSD: Number((d.priceCRC / (exchangeRate || 515)).toFixed(2)),
+  }));
+
+  const availableDishes = dishesWithCalculatedUSD.filter((d) => d.isAvailable);
   const currentCategoryDishes = selectedCategory
     ? availableDishes.filter((d) => d.categoryId === selectedCategory)
     : availableDishes;
@@ -134,21 +142,37 @@ export default function App() {
                   </p>
                 </div>
 
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="bg-[#1C3F32] hover:bg-[#142e25] text-white"
-                  onClick={() => {
-                    setEditingDish(null);
-                    setIsEditModalOpen(true);
-                  }}
-                >
-                  + Nuevo Platillo
-                </Button>
+                <div className="flex items-center gap-3">
+                  {/* Ajuste rápido de la tasa de cambio de la casa */}
+                  <div className="flex items-center gap-2 bg-[#FBFBF9] border border-gray-200 px-3 py-1.5 rounded-2xl text-xs">
+                    <span className="text-gray-500 font-semibold">$1 USD =</span>
+                    <span className="font-bold text-gray-900">₡</span>
+                    <input
+                      type="number"
+                      step="5"
+                      min="100"
+                      value={exchangeRate}
+                      onChange={(e) => setExchangeRate(parseFloat(e.target.value) || 515)}
+                      className="w-16 bg-white border border-gray-200 rounded-lg px-2 py-0.5 text-xs font-bold text-gray-900 text-center focus:outline-none focus:ring-1 focus:ring-brand-green"
+                    />
+                  </div>
+
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="bg-[#1C3F32] hover:bg-[#142e25] text-white"
+                    onClick={() => {
+                      setEditingDish(null);
+                      setIsEditModalOpen(true);
+                    }}
+                  >
+                    + Nuevo Platillo
+                  </Button>
+                </div>
               </div>
 
               <DishTable
-                dishes={dbDishes}
+                dishes={dishesWithCalculatedUSD}
                 categories={dbCategories}
                 onEdit={(dish) => {
                   setEditingDish(dish);

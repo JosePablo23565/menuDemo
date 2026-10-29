@@ -7,6 +7,10 @@ interface MenuState {
   language: Language;
   tableNumber: string | null;
 
+  // Tipo de cambio del restaurante: 1 USD = X Colones (por defecto ₡515)
+  exchangeRate: number;
+  setExchangeRate: (rate: number) => void;
+
   diners: Diner[];
   activeDinerId: string;
 
@@ -41,9 +45,13 @@ const DEFAULT_DINERS: Diner[] = [
 export const useMenuStore = create<MenuState>()(
   persist(
     (set, get) => ({
-      currency: 'CRC', // Por defecto Colones Costarricenses
+      currency: 'CRC',
       language: 'es',
       tableNumber: null,
+      exchangeRate: 515, // Tasa de cambio de la casa: $1 USD = ₡515 CRC
+
+      setExchangeRate: (exchangeRate) => set({ exchangeRate }),
+
       diners: DEFAULT_DINERS,
       activeDinerId: 'diner-1',
       cart: [],
@@ -77,6 +85,9 @@ export const useMenuStore = create<MenuState>()(
 
       addItemToDiner: (dish, dinerId) => {
         const targetDinerId = dinerId || get().activeDinerId;
+        const rate = get().exchangeRate || 515;
+        const autoUSD = Number((dish.priceCRC / rate).toFixed(2));
+
         set((state) => {
           const existing = state.cart.find(
             (item) => item.dishId === dish.id && item.dinerId === targetDinerId
@@ -97,7 +108,7 @@ export const useMenuStore = create<MenuState>()(
             dishId: dish.id,
             name: dish.name.toUpperCase(),
             priceCRC: dish.priceCRC,
-            priceUSD: dish.priceUSD,
+            priceUSD: autoUSD,
             quantity: 1,
             dinerId: targetDinerId,
           };
@@ -134,21 +145,22 @@ export const useMenuStore = create<MenuState>()(
       clearCart: () => set({ cart: [] }),
 
       getTableTotal: (curr) => {
-        const { cart } = get();
-        return cart.reduce((acc, item) => {
-          const price = curr === 'CRC' ? item.priceCRC : item.priceUSD;
-          return acc + price * item.quantity;
-        }, 0);
+        const { cart, exchangeRate } = get();
+        const rate = exchangeRate || 515;
+        const totalCRC = cart.reduce((acc, item) => acc + item.priceCRC * item.quantity, 0);
+
+        if (curr === 'CRC') return totalCRC;
+        return Number((totalCRC / rate).toFixed(2));
       },
 
       getDinerTotal: (dinerId, curr) => {
-        const { cart } = get();
-        return cart
-          .filter((item) => item.dinerId === dinerId)
-          .reduce((acc, item) => {
-            const price = curr === 'CRC' ? item.priceCRC : item.priceUSD;
-            return acc + price * item.quantity;
-          }, 0);
+        const { cart, exchangeRate } = get();
+        const rate = exchangeRate || 515;
+        const dinerItems = cart.filter((item) => item.dinerId === dinerId);
+        const totalCRC = dinerItems.reduce((acc, item) => acc + item.priceCRC * item.quantity, 0);
+
+        if (curr === 'CRC') return totalCRC;
+        return Number((totalCRC / rate).toFixed(2));
       },
 
       getTotalItemsCount: () => {
@@ -164,6 +176,7 @@ export const useMenuStore = create<MenuState>()(
         language: state.language,
         tableNumber: state.tableNumber,
         cart: state.cart,
+        exchangeRate: state.exchangeRate,
       }),
     }
   )
