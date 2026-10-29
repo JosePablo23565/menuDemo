@@ -32,7 +32,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, isLoading }) =>
             </svg>
           </div>
           <h2 className="font-serif text-2xl font-bold text-gray-900">Panel de Administración</h2>
-          <p className="text-xs text-gray-400 mt-1">Ingresa con tu cuenta de Supabase</p>
+          <p className="text-xs text-gray-400 mt-1">Ingresa con tus credenciales de acceso</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -39,7 +39,7 @@ export const DishTable: React.FC<DishTableProps> = ({
           {dishes.length === 0 ? (
             <tr>
               <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
-                No hay platillos en la base de datos aún.
+                No hay platillos registrados aún.
               </td>
             </tr>
           ) : (
@@ -103,7 +103,7 @@ export const DishTable: React.FC<DishTableProps> = ({
                     variant="danger"
                     size="sm"
                     onClick={() => {
-                      if (confirm(`¿Eliminar ${dish.name} de Supabase?`)) onDelete(dish.id);
+                      if (confirm(`¿Eliminar ${dish.name}?`)) onDelete(dish.id);
                     }}
                   >
                     Eliminar

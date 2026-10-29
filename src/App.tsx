@@ -26,15 +26,12 @@ export default function App() {
 
   const { isAuthenticated, signIn, signOut } = useAuth();
 
-  // Detección de ruta secreta: solo si la URL es /admin
   const [isAdminRoute, setIsAdminRoute] = useState(() => {
     return window.location.pathname.startsWith('/admin');
   });
 
-  // Sección activa dentro del panel Admin
   const [adminSection, setAdminSection] = useState<AdminSection>('cocina');
 
-  // Queries directas desde Supabase
   const { data: dbCategories = [], isLoading: isLoadingCategories } = useCategories();
   const { data: dbDishes = [], isLoading: isLoadingDishes } = useDishes({ onlyAvailable: false });
   const upsertDishMutation = useUpsertDish();
@@ -43,7 +40,6 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isLargeView, setIsLargeView] = useState(false);
 
-  // Estados de modal admin
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
 
@@ -113,7 +109,6 @@ export default function App() {
 
     return (
       <div className="min-h-screen bg-[#FBFBF9] dot-pattern flex">
-        {/* Barra Lateral Izquierda Fija idéntica a la captura */}
         <AdminSidebar
           currentSection={adminSection}
           onSelectSection={setAdminSection}
@@ -121,12 +116,9 @@ export default function App() {
           onLogout={() => signOut()}
         />
 
-        {/* Contenido Principal del Módulo Seleccionado */}
         <main className="flex-1 p-8 overflow-y-auto max-h-screen">
-          {/* Módulo 1: COCINA (KDS) */}
           {adminSection === 'cocina' && <KitchenDisplaySystem />}
 
-          {/* Módulo 2: MI CARTA (GESTIÓN DE PLATOS SUPABASE) */}
           {adminSection === 'carta' && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
@@ -138,7 +130,7 @@ export default function App() {
                     Platillos y Categorías
                   </h2>
                   <p className="text-xs text-gray-500 mt-1">
-                    Conectado en vivo a Supabase ({dbDishes.length} platillos en BD)
+                    {dbDishes.length} platillos registrados
                   </p>
                 </div>
 
@@ -180,10 +172,8 @@ export default function App() {
             </div>
           )}
 
-          {/* Módulo 3: GENERADOR DE QR */}
           {adminSection === 'qr' && <QrGenerator />}
 
-          {/* Módulos en preparación */}
           {['resumen', 'pedidos', 'promociones', 'sugerencias', 'apariencia'].includes(
             adminSection
           ) && (
@@ -192,7 +182,7 @@ export default function App() {
                 Módulo de {adminSection}
               </h3>
               <p className="text-xs text-gray-400 max-w-sm mx-auto">
-                Este módulo está listo para enlazar más reportes o configuraciones visuales.
+                Este módulo está listo para enlazar más configuraciones de tu restaurante.
               </p>
             </div>
           )}
@@ -202,7 +192,7 @@ export default function App() {
   }
 
   // ========================================================
-  // RUTA PÚBLICA (/): VISTA ÚNICA Y EXCLUSIVA PARA COMENSAL
+  // RUTA PÚBLICA (/): MENÚ CLIENTES
   // ========================================================
   return (
     <div className="min-h-screen dot-pattern text-gray-900 pb-28">
@@ -266,7 +256,7 @@ export default function App() {
 
           {isLoadingDishes ? (
             <div className="py-12 text-center text-xs text-gray-400">
-              Cargando menú en vivo desde Supabase...
+              Cargando carta...
             </div>
           ) : currentCategoryDishes.length === 0 ? (
             <div className="py-12 text-center text-xs text-gray-400 bg-white rounded-3xl border border-gray-100 p-6">

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import type { Category, Dish } from '../types/database';
+import type { Category, Dish, KitchenOrder, OrderStatus } from '../types/database';
 
 export function useCategories() {
   return useQuery({
@@ -12,7 +13,7 @@ export function useCategories() {
         .order('name', { ascending: true });
 
       if (error) {
-        console.warn('Error al cargar categorías de Supabase:', error.message);
+        console.warn('Error al cargar categorías:', error.message);
         return [];
       }
 
@@ -41,7 +42,7 @@ export function useDishes(options?: { categoryId?: string; onlyAvailable?: boole
       const { data, error } = await query.order('name', { ascending: true });
 
       if (error) {
-        console.warn('Error al cargar platos de Supabase:', error.message);
+        console.warn('Error al cargar platos:', error.message);
         return [];
       }
 
@@ -69,7 +70,7 @@ export function useUpsertDish() {
       const dbPayload: any = {
         name: dish.name,
         description: dish.description,
-        price_cop: dish.priceCRC, // mapeo compatible
+        price_cop: dish.priceCRC,
         price_usd: dish.priceUSD,
         image_url: dish.imageUrl,
         category_id: dish.categoryId,
@@ -107,6 +108,117 @@ export function useDeleteDish() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dishes'] });
+    },
+  });
+}
+
+/**
+ * Hook para enviar comanda desde el carrito móvil a cocina
+ */
+export function useCreateOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (newOrder: {
+      tableNumber: string;
+      items: { quantity: number; name: string }[];
+      totalCRC: number;
+      totalUSD: number;
+    }) => {
+      const { data, error } = await supabase
+        .from('orders')
+        .insert({
+          table_number: newOrder.tableNumber,
+          items: newOrder.items,
+          total_crc: newOrder.totalCRC,
+          total_usd: newOrder.totalUSD,
+          status: 'nuevo',
+        })
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
+}
+
+/**
+ * Hook para obtener y suscribirse en tiempo real a los pedidos de cocina (KDS)
+ */
+export function useKitchenOrders() {
+  const queryClient = useQueryClient();
+
+  // Suscripción Realtime por WebSockets
+  useEffect(() => {
+    const channel = supabase
+      .channel('kds-orders-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['orders'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const query = useQuery({
+    queryKey: ['orders'],
+    queryFn: async (): Promise<KitchenOrder[]> => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.warn('Error al cargar pedidos:', error.message);
+        return [];
+      }
+
+      return (data || []).map((row: any) => ({
+        id: row.id,
+        tableNumber: row.table_number,
+        status: row.status as OrderStatus,
+        items: row.items || [],
+        totalCRC: Number(row.total_crc || 0),
+        totalUSD: Number(row.total_usd || 0),
+        createdAt: row.created_at,
+      }));
+    },
+    staleTime: 1000 * 10,
+  });
+
+  return query;
+}
+
+/**
+ * Hook para actualizar el estado del pedido en cocina (ej: nuevo -> en_curso -> listo)
+ */
+export function useUpdateOrderStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ orderId, status }: { orderId: string; status: OrderStatus }) => {
+      const { data, error } = await supabase
+        .from('orders')
+        .update({ status })
+        .eq('id', orderId)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
   });
 }

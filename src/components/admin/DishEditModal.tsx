@@ -172,7 +172,7 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
             isLoading={isLoading}
             className="bg-[#1C3F32] hover:bg-[#142e25] text-white"
           >
-            Guardar en Supabase
+            Guardar platillo
           </Button>
         </div>
       </form>
