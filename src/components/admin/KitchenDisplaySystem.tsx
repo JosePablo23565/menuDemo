@@ -37,18 +37,9 @@ export const KitchenDisplaySystem: React.FC = () => {
       {/* Cabecera del KDS */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-black/[0.05] shadow-xs">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-800 font-sans">
-              Tablero en tiempo real
-            </span>
-          </div>
           <h2 className="font-serif text-3xl font-bold text-gray-900">
-            Comandas de Cocina
+            Comandas
           </h2>
-          <p className="text-xs text-gray-400 mt-0.5">
-            {orders.length} {orders.length === 1 ? 'comanda registrada' : 'comandas registradas'}
-          </p>
         </div>
 
         {/* Filtros rápidos tipo píldoras sobrias */}
@@ -85,7 +76,7 @@ export const KitchenDisplaySystem: React.FC = () => {
         <div className="py-20 text-center text-gray-400 bg-white rounded-3xl border border-black/[0.05] shadow-xs">
           <p className="font-serif text-2xl text-gray-700 mb-1">Sin comandas pendientes</p>
           <p className="text-xs max-w-sm mx-auto">
-            Los pedidos enviados desde los celulares de las mesas aparecerán aquí al instante en tiempo real.
+            Los pedidos enviados desde las mesas aparecerán aquí.
           </p>
         </div>
       ) : (
