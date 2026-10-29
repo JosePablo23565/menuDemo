@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Patrón de puntos sutil del fondo del diseño */
+.dot-pattern {
+  background-color: #FBFBF9;
+  background-image: radial-gradient(#d6d6cd 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Ocultar barra de scroll para navegación horizontal */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
