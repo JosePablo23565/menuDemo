@@ -16,6 +16,7 @@ export const CartDrawer: React.FC = () => {
     getTableTotal,
     addDiner,
     clearCart,
+    setActiveOrderId,
   } = useMenuStore();
 
   const [newDinerName, setNewDinerName] = useState('');
@@ -55,12 +56,16 @@ export const CartDrawer: React.FC = () => {
       const totalUSD = getTableTotal('USD');
       const tableName = tableNumber ? `Mesa #${tableNumber}` : 'Mesa General';
 
-      await createOrderMutation.mutateAsync({
+      const createdOrder = await createOrderMutation.mutateAsync({
         tableNumber: tableName,
         items: consolidatedItems,
         totalCRC,
         totalUSD,
       });
+
+      if (createdOrder?.id) {
+        setActiveOrderId(createdOrder.id);
+      }
 
       setIsSuccess(true);
       clearCart();

@@ -7,6 +7,7 @@ import { HomeHero } from './components/menu/HomeHero';
 import { DishCard } from './components/menu/DishCard';
 import { DishDetailModal } from './components/menu/DishDetailModal';
 import { CartDrawer } from './components/menu/CartDrawer';
+import { OrderStatusBanner } from './components/menu/OrderStatusBanner';
 import { FloatingBar } from './components/layout/FloatingBar';
 import { AdminLogin } from './components/admin/AdminLogin';
 import { AdminSidebar, type AdminSection } from './components/admin/AdminSidebar';
@@ -310,6 +311,8 @@ export default function App() {
         />
 
         <CartDrawer />
+
+        <OrderStatusBanner />
 
         <FloatingBar
           isLargeView={isLargeView}

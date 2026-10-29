@@ -1,13 +1,12 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { Currency, Language, Diner, TableCartItem, Dish } from '../types/database';
+import type { Currency, Language, Diner, TableCartItem, Dish, KitchenOrder } from '../types/database';
 
 interface MenuState {
   currency: Currency;
   language: Language;
   tableNumber: string | null;
 
-  // Tipo de cambio del restaurante: 1 USD = X Colones (por defecto ₡515)
   exchangeRate: number;
   setExchangeRate: (rate: number) => void;
 
@@ -18,6 +17,15 @@ interface MenuState {
   isCartOpen: boolean;
   selectedDish: Dish | null;
   isPromoOpen: boolean;
+
+  // Seguimiento persistente de orden activa en cocina
+  activeOrderId: string | null;
+  activeOrder: KitchenOrder | null;
+  isOrderModalOpen: boolean;
+
+  setActiveOrderId: (id: string | null) => void;
+  setActiveOrder: (order: KitchenOrder | null) => void;
+  setIsOrderModalOpen: (open: boolean) => void;
 
   setCurrency: (c: Currency) => void;
   setLanguage: (l: Language) => void;
@@ -48,7 +56,15 @@ export const useMenuStore = create<MenuState>()(
       currency: 'CRC',
       language: 'es',
       tableNumber: null,
-      exchangeRate: 515, // Tasa de cambio de la casa: $1 USD = ₡515 CRC
+      exchangeRate: 515,
+
+      activeOrderId: null,
+      activeOrder: null,
+      isOrderModalOpen: false,
+
+      setActiveOrderId: (activeOrderId) => set({ activeOrderId }),
+      setActiveOrder: (activeOrder) => set({ activeOrder }),
+      setIsOrderModalOpen: (isOrderModalOpen) => set({ isOrderModalOpen }),
 
       setExchangeRate: (exchangeRate) => set({ exchangeRate }),
 
@@ -170,13 +186,14 @@ export const useMenuStore = create<MenuState>()(
     }),
     {
       name: 'la-terraza-session',
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage), // Persistido en localStorage contra recargas
       partialize: (state) => ({
         currency: state.currency,
         language: state.language,
         tableNumber: state.tableNumber,
         cart: state.cart,
         exchangeRate: state.exchangeRate,
+        activeOrderId: state.activeOrderId,
       }),
     }
   )

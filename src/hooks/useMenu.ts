@@ -10,7 +10,7 @@ export function useCategories() {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('display_order', { ascending: true }); // Ordenado por display_order
+        .order('display_order', { ascending: true });
 
       if (error) {
         console.warn('Error al cargar categorías:', error.message);
@@ -223,5 +223,58 @@ export function useDeleteOrder() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
+  });
+}
+
+/**
+ * Hook para rastrear el pedido activo del comensal en vivo
+ */
+export function useActiveClientOrder(orderId: string | null) {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!orderId) return;
+
+    const channel = supabase
+      .channel(`client-order-${orderId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['active-order', orderId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [orderId, queryClient]);
+
+  return useQuery({
+    queryKey: ['active-order', orderId],
+    queryFn: async (): Promise<KitchenOrder | null> => {
+      if (!orderId) return null;
+
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+
+      if (error || !data) return null;
+
+      return {
+        id: data.id,
+        tableNumber: data.table_number,
+        status: data.status as OrderStatus,
+        items: data.items || [],
+        totalCRC: Number(data.total_crc || 0),
+        totalUSD: Number(data.total_usd || 0),
+        createdAt: data.created_at,
+      };
+    },
+    enabled: Boolean(orderId),
+    refetchInterval: 5000,
   });
 }
