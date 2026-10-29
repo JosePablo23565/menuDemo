@@ -21,7 +21,7 @@ export const KitchenDisplaySystem: React.FC = () => {
   };
 
   const handleDeleteOrder = (orderId: string, tableName: string) => {
-    if (confirm(`¿Deseas eliminar la comanda de ${tableName}? Esta acción no se puede deshacer.`)) {
+    if (confirm(`¿Deseas eliminar la comanda de ${tableName}?`)) {
       deleteOrderMutation.mutate(orderId);
     }
   };
@@ -80,51 +80,34 @@ export const KitchenDisplaySystem: React.FC = () => {
             return (
               <div
                 key={order.id}
-                className="bg-white rounded-3xl p-5 border border-gray-100/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group"
+                className="bg-white rounded-3xl p-5 border border-gray-100/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all relative group"
               >
+                {/* Ícono sutil de basurero en la parte superior derecha exacta */}
+                <button
+                  onClick={() => handleDeleteOrder(order.id, order.tableNumber)}
+                  className="absolute top-4 right-4 text-gray-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-xl transition-all"
+                  title="Eliminar comanda"
+                  aria-label="Eliminar comanda"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+
                 <div>
-                  <div className="flex items-center justify-between pb-3 border-b border-dashed border-gray-100">
-                    <div>
-                      <h3 className="font-serif text-2xl font-bold text-gray-900">
-                        {order.tableNumber}
-                      </h3>
-                      {order.createdAt && (
-                        <span className="text-[10px] text-gray-400 font-medium">
-                          {formatOrderTime(order.createdAt)}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {isNuevo && (
-                        <span className="bg-[#1C3F32] text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider animate-pulse">
-                          Nuevo
-                        </span>
-                      )}
-                      {isEnCurso && (
-                        <span className="bg-[#FEF08A] text-amber-900 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider">
-                          En curso
-                        </span>
-                      )}
-                      {isListo && (
-                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider">
-                          Listo
-                        </span>
-                      )}
-
-                      {/* Botón Eliminar / Cancelar Comanda */}
-                      <button
-                        onClick={() => handleDeleteOrder(order.id, order.tableNumber)}
-                        className="w-7 h-7 rounded-full bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-600 flex items-center justify-center transition-colors"
-                        title="Eliminar pedido"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
+                  {/* Cabecera limpia: Solo Mesa y Hora, sin badges de NUEVO */}
+                  <div className="pb-3 border-b border-dashed border-gray-100 pr-8">
+                    <h3 className="font-serif text-2xl font-bold text-gray-900">
+                      {order.tableNumber}
+                    </h3>
+                    {order.createdAt && (
+                      <span className="text-[10px] text-gray-400 font-medium">
+                        {formatOrderTime(order.createdAt)}
+                      </span>
+                    )}
                   </div>
 
+                  {/* Lista de productos */}
                   <div className="py-4 space-y-2.5">
                     {order.items.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-2.5 text-xs">
@@ -139,6 +122,7 @@ export const KitchenDisplaySystem: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Footer de la comanda con Total y Acción */}
                 <div className="pt-4 border-t border-dashed border-gray-100 flex items-center justify-between gap-2 mt-auto">
                   <span className="font-bold text-xs text-gray-900">
                     {formatPrice(order.totalCRC, 'CRC')}
