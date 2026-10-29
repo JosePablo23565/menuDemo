@@ -101,16 +101,23 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   return (
     <aside className="w-64 bg-white border-r border-gray-100 flex flex-col justify-between shrink-0 h-screen sticky top-0 p-5 shadow-xs">
       <div>
-        {/* Logo del Restaurante */}
-        <div className="flex items-center gap-2.5 mb-8 px-2">
-          <div className="w-8 h-8 rounded-full border border-gray-900 flex items-center justify-center">
-            <svg className="w-5 h-5 text-gray-900" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3v4m0 0a6 6 0 016 6v7H6v-7a6 6 0 016-6z" />
-            </svg>
+        {/* Logo Oficial Casa Tamarindo */}
+        <div className="flex items-center gap-3 mb-8 px-2">
+          <div className="w-10 h-10 rounded-full overflow-hidden shadow-xs border border-gray-200/80 shrink-0 bg-[#36432b]">
+            <img
+              src="/logo.png"
+              alt="Casa Tamarindo"
+              className="w-full h-full object-cover"
+            />
           </div>
-          <span className="font-serif text-xl font-bold tracking-tight text-gray-900">
-            La Terraza
-          </span>
+          <div>
+            <span className="font-serif text-lg font-bold tracking-tight text-gray-900 block leading-tight">
+              Casa Tamarindo
+            </span>
+            <span className="text-[10px] text-gray-400 font-semibold tracking-wider">
+              PANEL ADMIN
+            </span>
+          </div>
         </div>
 
         {/* Lista de Navegación */}
@@ -152,8 +159,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
         <div className="px-2 flex items-center justify-between text-xs">
           <div>
-            <p className="font-bold text-gray-900 text-xs">La Terraza</p>
-            <p className="text-[10px] text-gray-400">Admin activo</p>
+            <p className="font-bold text-gray-900 text-xs">Casa Tamarindo</p>
+            <p className="text-[10px] text-gray-400">Tel: 6045-4528</p>
           </div>
           <button
             onClick={onLogout}
