@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useMenuStore } from '../../store/useMenuStore';
 import { useCreateOrder } from '../../hooks/useMenu';
 import { formatPrice } from '../../lib/utils';
@@ -22,9 +22,18 @@ export const CartDrawer: React.FC = () => {
   const [newDinerName, setNewDinerName] = useState('');
   const [showAddDiner, setShowAddDiner] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const dinerInputRef = useRef<HTMLInputElement>(null);
 
   const createOrderMutation = useCreateOrder();
   const tableTotal = getTableTotal(currency);
+
+  useEffect(() => {
+    if (showAddDiner && dinerInputRef.current) {
+      setTimeout(() => {
+        dinerInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+  }, [showAddDiner]);
 
   if (!isCartOpen) return null;
 
@@ -85,9 +94,9 @@ export const CartDrawer: React.FC = () => {
         onClick={() => !createOrderMutation.isPending && setIsCartOpen(false)}
       />
 
-      <div className="relative z-10 w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-hidden shadow-2xl flex flex-col dot-pattern">
+      <div className="relative z-10 w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[85dvh] sm:max-h-[88vh] overflow-hidden shadow-2xl flex flex-col dot-pattern">
         {/* Header con título Pedido */}
-        <div className="p-5 pb-3 flex items-center justify-between border-b border-gray-100 bg-white">
+        <div className="p-5 pb-3 flex items-center justify-between border-b border-gray-100 bg-white shrink-0">
           <div>
             <h2 className="font-serif text-3xl font-bold text-gray-900 tracking-tight">
               Pedido
@@ -122,7 +131,7 @@ export const CartDrawer: React.FC = () => {
         ) : (
           <>
             {/* Lista de comensales y sus productos */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-6">
+            <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-6 overscroll-contain">
               {cart.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
                   <p className="text-sm">Tu pedido está vacío.</p>
@@ -212,23 +221,24 @@ export const CartDrawer: React.FC = () => {
                   {showAddDiner ? (
                     <form onSubmit={handleAddDiner} className="flex gap-2 pt-2">
                       <input
+                        ref={dinerInputRef}
                         type="text"
                         autoFocus
                         placeholder="Nombre del comensal..."
                         value={newDinerName}
                         onChange={(e) => setNewDinerName(e.target.value)}
-                        className="flex-1 text-xs border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-green bg-white"
+                        className="flex-1 text-[16px] sm:text-xs border border-gray-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#1C3F32] bg-white text-gray-900"
                       />
                       <button
                         type="submit"
-                        className="bg-brand-green text-white text-xs font-semibold px-3 py-2 rounded-xl"
+                        className="bg-[#1C3F32] hover:bg-[#152e25] text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shrink-0"
                       >
                         Agregar
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowAddDiner(false)}
-                        className="text-gray-400 text-xs px-2"
+                        className="text-gray-400 hover:text-gray-600 text-xs px-2.5 shrink-0"
                       >
                         ✕
                       </button>
@@ -236,7 +246,7 @@ export const CartDrawer: React.FC = () => {
                   ) : (
                     <button
                       onClick={() => setShowAddDiner(true)}
-                      className="text-xs text-brand-green hover:underline font-semibold flex items-center gap-1 pt-1"
+                      className="text-xs text-[#1C3F32] hover:underline font-semibold flex items-center gap-1 pt-1"
                     >
                       + Agregar otro comensal a la mesa
                     </button>
@@ -247,7 +257,7 @@ export const CartDrawer: React.FC = () => {
 
             {/* Footer con Total y Enviar a Cocina */}
             {cart.length > 0 && (
-              <div className="p-5 border-t border-gray-100 bg-white space-y-4">
+              <div className="p-5 border-t border-gray-100 bg-white space-y-4 shrink-0">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-base text-gray-900">Total de la mesa</span>
                   <span className="font-bold text-base text-gray-900">

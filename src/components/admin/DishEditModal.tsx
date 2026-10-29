@@ -170,10 +170,10 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
           </select>
         </div>
 
-        {/* Zona de Subida de Fotos con Conversión a WebP Automática */}
+        {/* Zona de Subida de Fotos */}
         <div>
           <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-            Foto del Platillo (Optimización WebP automática)
+            Foto del platillo
           </label>
 
           <input
@@ -194,7 +194,7 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
                 />
                 {isUploadingImage && (
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-[10px] text-white font-semibold">
-                    WebP...
+                    Subiendo...
                   </div>
                 )}
               </div>
@@ -213,11 +213,8 @@ export const DishEditModal: React.FC<DishEditModalProps> = ({
                 onClick={() => fileInputRef.current?.click()}
                 className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3.5 py-2 rounded-xl text-xs font-semibold shadow-2xs transition-all active:scale-95 disabled:opacity-50"
               >
-                {isUploadingImage ? 'Optimizando imagen...' : imagePreview ? 'Cambiar foto' : 'Subir foto'}
+                {isUploadingImage ? 'Subiendo...' : imagePreview ? 'Cambiar foto' : 'Subir foto'}
               </button>
-              <p className="text-[10px] text-gray-400 mt-1">
-                Acepta cualquier foto de móvil (JPG, PNG, HEIC) y la convierte a WebP ultraligero.
-              </p>
             </div>
           </div>
         </div>
