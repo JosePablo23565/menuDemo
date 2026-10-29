@@ -94,7 +94,7 @@ export const CartDrawer: React.FC = () => {
         onClick={() => !createOrderMutation.isPending && setIsCartOpen(false)}
       />
 
-      <div className="relative z-10 w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[85dvh] sm:max-h-[88vh] overflow-hidden shadow-2xl flex flex-col dot-pattern">
+      <div className="relative z-10 w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[85dvh] sm:max-h-[88vh] overflow-hidden shadow-2xl flex flex-col border border-black/[0.05]">
         {/* Header con título Pedido */}
         <div className="p-5 pb-3 flex items-center justify-between border-b border-gray-100 bg-white shrink-0">
           <div>

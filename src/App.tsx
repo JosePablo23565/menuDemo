@@ -98,7 +98,7 @@ export default function App() {
   if (isAdminRoute) {
     if (!isAuthenticated) {
       return (
-        <div className="min-h-screen bg-[#FBFBF9] dot-pattern flex flex-col justify-center p-4">
+        <div className="min-h-screen bg-[#FBFBF9] flex flex-col justify-center p-4">
           <div className="mb-4 text-center">
             <button
               onClick={() => navigateTo('/')}
@@ -117,7 +117,7 @@ export default function App() {
     }
 
     return (
-      <div className="min-h-screen bg-[#FBFBF9] dot-pattern flex">
+      <div className="min-h-screen bg-[#FBFBF9] flex">
         <AdminSidebar
           currentSection={adminSection}
           onSelectSection={setAdminSection}
@@ -130,7 +130,7 @@ export default function App() {
 
           {adminSection === 'carta' && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-black/[0.05] shadow-xs">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1">
                     CARTA DEL RESTAURANTE
@@ -145,23 +145,23 @@ export default function App() {
 
                 <div className="flex items-center gap-3">
                   {/* Ajuste rápido de la tasa de cambio de la casa */}
-                  <div className="flex items-center gap-2 bg-[#FBFBF9] border border-gray-200 px-3 py-1.5 rounded-2xl text-xs">
-                    <span className="text-gray-500 font-semibold">$1 USD =</span>
-                    <span className="font-bold text-gray-900">₡</span>
+                  <div className="flex items-center gap-2 bg-stone-50 border border-black/[0.06] px-3.5 py-2 rounded-2xl text-xs">
+                    <span className="text-gray-500 font-medium">Tasa Casa: $1 USD =</span>
+                    <span className="font-bold text-gray-900 font-mono">₡</span>
                     <input
                       type="number"
                       step="5"
                       min="100"
                       value={exchangeRate}
                       onChange={(e) => setExchangeRate(parseFloat(e.target.value) || 515)}
-                      className="w-16 bg-white border border-gray-200 rounded-lg px-2 py-0.5 text-xs font-bold text-gray-900 text-center focus:outline-none focus:ring-1 focus:ring-brand-green"
+                      className="w-16 bg-white border border-gray-200 rounded-xl px-2 py-1 text-xs font-bold font-mono text-gray-900 text-center focus:outline-none focus:ring-1 focus:ring-[#1C3F32]"
                     />
                   </div>
 
                   <Button
                     variant="primary"
                     size="sm"
-                    className="bg-[#1C3F32] hover:bg-[#142e25] text-white"
+                    className="bg-[#1C3F32] hover:bg-[#142e25] text-white rounded-2xl px-4 py-2.5 font-bold"
                     onClick={() => {
                       setEditingDish(null);
                       setIsEditModalOpen(true);
@@ -220,7 +220,7 @@ export default function App() {
   // RUTA PÚBLICA (/): MENÚ CLIENTES
   // ========================================================
   return (
-    <div className="min-h-screen dot-pattern text-gray-900 pb-28">
+    <div className="min-h-screen bg-[#FBFBF9] text-gray-900 pb-28">
       <TopHeader />
 
       <main className="max-w-md mx-auto">

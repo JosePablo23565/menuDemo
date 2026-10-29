@@ -23,45 +23,56 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, isLoading }) =>
   };
 
   return (
-    <div className="flex min-h-[65vh] items-center justify-center p-4">
-      <Card className="w-full max-w-sm p-6 shadow-xl border border-gray-100 rounded-3xl">
-        <div className="text-center mb-6">
-          <div className="mx-auto w-12 h-12 bg-emerald-50 text-brand-green rounded-full flex items-center justify-center mb-3">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+    <div className="flex min-h-[75vh] items-center justify-center p-4">
+      <Card className="w-full max-w-sm p-8 shadow-xl border border-black/[0.06] rounded-3xl bg-white">
+        <div className="text-center mb-7">
+          <div className="mx-auto w-16 h-16 rounded-full overflow-hidden shadow-xs border border-black/10 shrink-0 bg-[#36432b] mb-4">
+            <img
+              src="/logo.png"
+              alt="Casa Tamarindo"
+              className="w-full h-full object-cover"
+              loading="eager"
+            />
           </div>
-          <h2 className="font-serif text-2xl font-bold text-gray-900">Panel de Administración</h2>
-          <p className="text-xs text-gray-400 mt-1">Ingresa con tus credenciales de acceso</p>
+          <h2 className="font-serif text-2xl font-bold text-gray-900 leading-tight">
+            Casa Tamarindo
+          </h2>
+          <p className="text-xs text-gray-400 mt-1 font-medium">
+            Acceso administrativo y cocina
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Correo Electrónico</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+              Correo electrónico
+            </label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@laterraza.com"
-              className="w-full rounded-2xl border border-gray-200 px-3.5 py-2.5 text-xs focus:border-brand-green focus:outline-none focus:ring-1 focus:ring-brand-green"
+              placeholder="admin@casatamarindo.cr"
+              className="w-full rounded-2xl border border-gray-200 px-3.5 py-2.5 text-xs text-gray-900 focus:border-[#1C3F32] focus:outline-none focus:ring-1 focus:ring-[#1C3F32] bg-stone-50/50"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Contraseña</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+              Contraseña
+            </label>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-2xl border border-gray-200 px-3.5 py-2.5 text-xs focus:border-brand-green focus:outline-none focus:ring-1 focus:ring-brand-green"
+              className="w-full rounded-2xl border border-gray-200 px-3.5 py-2.5 text-xs text-gray-900 focus:border-[#1C3F32] focus:outline-none focus:ring-1 focus:ring-[#1C3F32] bg-stone-50/50"
             />
           </div>
 
           {error && (
-            <div className="p-2.5 rounded-xl bg-red-50 text-red-600 text-xs font-medium">
+            <div className="p-3 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-xs font-medium">
               {error}
             </div>
           )}
@@ -69,10 +80,10 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin, isLoading }) =>
           <Button
             type="submit"
             variant="primary"
-            className="w-full bg-[#1C3F32] hover:bg-[#142e25] text-white py-3 rounded-2xl text-xs font-semibold shadow-sm"
+            className="w-full bg-[#1C3F32] hover:bg-[#142e25] text-white py-3.5 rounded-2xl text-xs font-semibold shadow-sm transition-transform active:scale-[0.98] mt-2"
             isLoading={isLoading}
           >
-            Iniciar Sesión
+            Ingresar al panel
           </Button>
         </form>
       </Card>

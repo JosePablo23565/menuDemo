@@ -21,7 +21,7 @@ export const KitchenDisplaySystem: React.FC = () => {
   };
 
   const handleDeleteOrder = (orderId: string, tableName: string) => {
-    if (confirm(`¿Deseas eliminar la comanda de ${tableName}?`)) {
+    if (confirm(`¿Deseas retirar la comanda de ${tableName}?`)) {
       deleteOrderMutation.mutate(orderId);
     }
   };
@@ -34,41 +34,59 @@ export const KitchenDisplaySystem: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Cabecera del KDS */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-black/[0.05] shadow-xs">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-1">
-            TABLERO DE COCINA
-          </span>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-800 font-sans">
+              Tablero en tiempo real
+            </span>
+          </div>
           <h2 className="font-serif text-3xl font-bold text-gray-900">
-            Pedidos activos
+            Comandas de Cocina
           </h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {orders.length} {orders.length === 1 ? 'comanda registrada' : 'comandas registradas'}
+          </p>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-2xl border border-gray-100 shadow-2xs">
-          {(['TODOS', 'NUEVOS', 'EN_CURSO', 'LISTOS'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setFilter(tab)}
-              className={`px-3 py-1.5 rounded-xl text-[11px] font-bold tracking-wider uppercase transition-all ${
-                filter === tab
-                  ? 'bg-black text-white shadow-xs'
-                  : 'text-gray-400 hover:text-gray-700'
-              }`}
-            >
-              {tab.replace('_', ' ')}
-            </button>
-          ))}
+        {/* Filtros rápidos tipo píldoras sobrias */}
+        <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-black/[0.04]">
+          {(['TODOS', 'NUEVOS', 'EN_CURSO', 'LISTOS'] as const).map((tab) => {
+            const labels = {
+              TODOS: 'Todas',
+              NUEVOS: 'Nuevas',
+              EN_CURSO: 'En preparación',
+              LISTOS: 'Listas',
+            };
+            return (
+              <button
+                key={tab}
+                onClick={() => setFilter(tab)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  filter === tab
+                    ? 'bg-white text-gray-900 shadow-2xs font-bold'
+                    : 'text-gray-500 hover:text-gray-800'
+                }`}
+              >
+                {labels[tab]}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {isLoading ? (
         <div className="py-20 text-center text-xs text-gray-400">
-          Cargando pedidos en vivo...
+          Cargando pedidos de cocina...
         </div>
       ) : filteredOrders.length === 0 ? (
-        <div className="py-20 text-center text-gray-400 bg-white rounded-3xl border border-gray-100">
-          <p className="font-serif text-xl text-gray-700 mb-1">Sin comandas activas</p>
-          <p className="text-xs">Los pedidos enviados desde los celulares de las mesas aparecerán aquí al instante.</p>
+        <div className="py-20 text-center text-gray-400 bg-white rounded-3xl border border-black/[0.05] shadow-xs">
+          <p className="font-serif text-2xl text-gray-700 mb-1">Sin comandas pendientes</p>
+          <p className="text-xs max-w-sm mx-auto">
+            Los pedidos enviados desde los celulares de las mesas aparecerán aquí al instante en tiempo real.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -80,12 +98,12 @@ export const KitchenDisplaySystem: React.FC = () => {
             return (
               <div
                 key={order.id}
-                className="bg-white rounded-3xl p-5 border border-gray-100/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all relative group"
+                className="bg-white rounded-3xl p-5 border border-black/[0.06] shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between relative group"
               >
-                {/* Ícono sutil de basurero en la parte superior derecha exacta */}
+                {/* Botón sutil de descartar/eliminar */}
                 <button
                   onClick={() => handleDeleteOrder(order.id, order.tableNumber)}
-                  className="absolute top-4 right-4 text-gray-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-xl transition-all"
+                  className="absolute top-4 right-4 text-gray-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-xl transition-colors"
                   title="Eliminar comanda"
                   aria-label="Eliminar comanda"
                 >
@@ -95,26 +113,40 @@ export const KitchenDisplaySystem: React.FC = () => {
                 </button>
 
                 <div>
-                  {/* Cabecera limpia: Solo Mesa y Hora, sin badges de NUEVO */}
-                  <div className="pb-3 border-b border-dashed border-gray-100 pr-8">
-                    <h3 className="font-serif text-2xl font-bold text-gray-900">
-                      {order.tableNumber}
-                    </h3>
-                    {order.createdAt && (
-                      <span className="text-[10px] text-gray-400 font-medium">
-                        {formatOrderTime(order.createdAt)}
-                      </span>
-                    )}
+                  {/* Cabecera de la comanda: Mesa y Hora */}
+                  <div className="pb-3 border-b border-gray-100 pr-8 flex items-baseline justify-between">
+                    <div>
+                      <h3 className="font-serif text-2xl font-bold text-gray-900 tracking-tight">
+                        {order.tableNumber}
+                      </h3>
+                      {order.createdAt && (
+                        <span className="text-[11px] text-gray-400 font-medium">
+                          Hora: {formatOrderTime(order.createdAt)}
+                        </span>
+                      )}
+                    </div>
+
+                    <span
+                      className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
+                        isNuevo
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                          : isEnCurso
+                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 animate-pulse'
+                          : 'bg-stone-100 text-gray-700'
+                      }`}
+                    >
+                      {isNuevo ? 'Nuevo' : isEnCurso ? 'Preparando' : 'Listo'}
+                    </span>
                   </div>
 
-                  {/* Lista de productos */}
-                  <div className="py-4 space-y-2.5">
+                  {/* Lista de productos con cantidades destacadas en alta legibilidad para cocina */}
+                  <div className="py-4 space-y-3">
                     {order.items.map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5 text-xs">
-                        <span className="font-extrabold text-gray-900 w-5">
+                      <div key={idx} className="flex items-center gap-3">
+                        <span className="font-mono text-sm font-extrabold text-[#1C3F32] bg-emerald-50/80 border border-emerald-100 w-8 h-8 rounded-xl flex items-center justify-center shrink-0">
                           {item.quantity}×
                         </span>
-                        <span className="font-semibold text-gray-800 uppercase tracking-wide">
+                        <span className="font-semibold text-gray-900 text-xs sm:text-sm tracking-wide uppercase">
                           {item.name}
                         </span>
                       </div>
@@ -122,9 +154,9 @@ export const KitchenDisplaySystem: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Footer de la comanda con Total y Acción */}
-                <div className="pt-4 border-t border-dashed border-gray-100 flex items-center justify-between gap-2 mt-auto">
-                  <span className="font-bold text-xs text-gray-900">
+                {/* Footer de la comanda con Total y Botones de acción táctiles para cocina */}
+                <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto">
+                  <span className="font-mono font-bold text-xs text-gray-600">
                     {formatPrice(order.totalCRC, 'CRC')}
                   </span>
 
@@ -132,16 +164,16 @@ export const KitchenDisplaySystem: React.FC = () => {
                     {isNuevo && (
                       <button
                         onClick={() => handleUpdateStatus(order.id, 'en_curso')}
-                        className="bg-[#1C3F32] hover:bg-[#142e25] text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all active:scale-95"
+                        className="bg-[#1C3F32] hover:bg-[#152e25] active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition-transform"
                       >
-                        Iniciar pedido
+                        Iniciar preparación
                       </button>
                     )}
 
                     {isEnCurso && (
                       <button
                         onClick={() => handleUpdateStatus(order.id, 'listo')}
-                        className="bg-[#D97706] hover:bg-[#b45309] text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all active:scale-95"
+                        className="bg-amber-600 hover:bg-amber-700 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition-transform"
                       >
                         Marcar listo
                       </button>
@@ -150,9 +182,9 @@ export const KitchenDisplaySystem: React.FC = () => {
                     {isListo && (
                       <button
                         onClick={() => handleUpdateStatus(order.id, 'entregado')}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95"
+                        className="bg-stone-100 hover:bg-stone-200 active:scale-95 text-gray-800 px-4 py-2.5 rounded-xl text-xs font-bold border border-black/[0.05] transition-transform"
                       >
-                        Archivar
+                        Archivar comanda
                       </button>
                     )}
                   </div>
