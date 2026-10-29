@@ -16,7 +16,6 @@ import type { Dish } from './types/database';
 
 export default function App() {
   const {
-    tableNumber,
     syncTableFromUrl,
     selectedDish,
     setSelectedDish,
@@ -24,14 +23,17 @@ export default function App() {
 
   const { isAuthenticated, signIn, signOut } = useAuth();
 
-  // Queries directas desde Supabase (100% dinámicas, 0 datos quemados)
+  // Detección de ruta secreta: solo si la URL es /admin o /admin/
+  const [isAdminRoute, setIsAdminRoute] = useState(() => {
+    return window.location.pathname.startsWith('/admin');
+  });
+
+  // Queries directas desde Supabase
   const { data: dbCategories = [], isLoading: isLoadingCategories } = useCategories();
   const { data: dbDishes = [], isLoading: isLoadingDishes } = useDishes({ onlyAvailable: false });
   const upsertDishMutation = useUpsertDish();
   const deleteDishMutation = useDeleteDish();
 
-  // Navegación de pestañas
-  const [activeTab, setActiveTab] = useState<'menu' | 'admin'>('menu');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isLargeView, setIsLargeView] = useState(false);
 
@@ -41,6 +43,13 @@ export default function App() {
 
   useEffect(() => {
     syncTableFromUrl();
+
+    // Escuchar cambios de historial en el navegador
+    const handlePopState = () => {
+      setIsAdminRoute(window.location.pathname.startsWith('/admin'));
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, [syncTableFromUrl]);
 
   // Seleccionar la primera categoría que llegue de la base de datos
@@ -50,7 +59,7 @@ export default function App() {
     }
   }, [dbCategories, selectedCategory]);
 
-  // Filtrado de comensales (solo disponibles)
+  // Filtrado de comensales (solo platos disponibles)
   const availableDishes = dbDishes.filter((d) => d.isAvailable);
   const currentCategoryDishes = selectedCategory
     ? availableDishes.filter((d) => d.categoryId === selectedCategory)
@@ -70,157 +79,34 @@ export default function App() {
     });
   };
 
-  return (
-    <div className="min-h-screen dot-pattern text-gray-900 pb-28">
-      {/* Barra superior con selector de modo de vista y estado de mesa */}
-      <div className="bg-white border-b border-gray-100 px-4 py-2 text-xs">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-gray-700">
-              {tableNumber ? `Mesa #${tableNumber}` : 'Comensal General'}
-            </span>
-          </div>
+  const navigateTo = (path: string) => {
+    window.history.pushState({}, '', path);
+    setIsAdminRoute(path.startsWith('/admin'));
+  };
 
-          <div className="flex items-center gap-1 bg-gray-100 p-0.5 rounded-xl">
-            <button
-              onClick={() => setActiveTab('menu')}
-              className={`px-3 py-1 rounded-lg font-semibold transition-all ${
-                activeTab === 'menu' ? 'bg-white shadow-2xs text-gray-900' : 'text-gray-400'
-              }`}
-            >
-              Menú Móvil
-            </button>
-            <button
-              onClick={() => setActiveTab('admin')}
-              className={`px-3 py-1 rounded-lg font-semibold transition-all ${
-                activeTab === 'admin' ? 'bg-white shadow-2xs text-gray-900' : 'text-gray-400'
-              }`}
-            >
-              Admin {isAuthenticated && '🟢'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ======================================================== */}
-      {/* VISTA 1: COMENSALES (DISEÑO MÓVIL EXACTO)                */}
-      {/* ======================================================== */}
-      {activeTab === 'menu' && (
-        <>
-          <TopHeader />
-
-          <main className="max-w-md mx-auto">
-            <HomeHero onExplore={scrollToMenu} />
-
-            <section id="menu-catalog" className="px-4 pt-4">
-              {/* Barra de Categorías obtenidas de Supabase */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                  {isLoadingCategories ? (
-                    <span className="text-xs text-gray-400 py-1">Cargando categorías...</span>
-                  ) : dbCategories.length === 0 ? (
-                    <span className="text-xs text-gray-400 py-1">No hay categorías registradas</span>
-                  ) : (
-                    dbCategories.map((cat) => {
-                      const isSelected = selectedCategory === cat.id;
-                      return (
-                        <button
-                          key={cat.id}
-                          onClick={() => setSelectedCategory(cat.id)}
-                          className={`font-serif text-lg sm:text-xl font-bold transition-all px-1 capitalize whitespace-nowrap ${
-                            isSelected
-                              ? 'text-gray-900 border-b-2 border-gray-900'
-                              : 'text-gray-400 hover:text-gray-600'
-                          }`}
-                        >
-                          {cat.name}
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-
-                {/* Switch Cuadrícula / Lista */}
-                <div className="flex items-center bg-white border border-gray-200 rounded-xl p-0.5 shadow-2xs">
-                  <button
-                    onClick={() => setIsLargeView(false)}
-                    className={`p-1.5 rounded-lg transition-colors ${
-                      !isLargeView ? 'bg-black text-white' : 'text-gray-400'
-                    }`}
-                    title="Cuadrícula"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setIsLargeView(true)}
-                    className={`p-1.5 rounded-lg transition-colors ${
-                      isLargeView ? 'bg-black text-white' : 'text-gray-400'
-                    }`}
-                    title="Vista Grande"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {/* Catálogo de Platillos desde Supabase */}
-              {isLoadingDishes ? (
-                <div className="py-12 text-center text-xs text-gray-400">
-                  Cargando menú en vivo desde Supabase...
-                </div>
-              ) : currentCategoryDishes.length === 0 ? (
-                <div className="py-12 text-center text-xs text-gray-400 bg-white rounded-3xl border border-gray-100 p-6">
-                  No hay platos disponibles en esta categoría.
-                </div>
-              ) : (
-                <div
-                  className={`grid gap-3.5 ${
-                    isLargeView ? 'grid-cols-1' : 'grid-cols-2'
-                  }`}
-                >
-                  {currentCategoryDishes.map((dish) => (
-                    <DishCard
-                      key={dish.id}
-                      dish={dish}
-                      isLargeView={isLargeView}
-                      onSelect={(d: Dish) => setSelectedDish(d)}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            <DishDetailModal
-              dish={selectedDish}
-              onClose={() => setSelectedDish(null)}
-            />
-
-            <CartDrawer />
-
-            <FloatingBar
-              isLargeView={isLargeView}
-              onToggleLargeView={() => setIsLargeView(!isLargeView)}
-            />
-          </main>
-        </>
-      )}
-
-      {/* ======================================================== */}
-      {/* VISTA 2: PANEL DE ADMINISTRACIÓN PROTEGIDO               */}
-      {/* ======================================================== */}
-      {activeTab === 'admin' && (
-        <main className="max-w-4xl mx-auto px-4 py-8">
+  // ========================================================
+  // RUTA PRIVADA: /admin (TOTALMENTE OCULTA PARA COMENSALES)
+  // ========================================================
+  if (isAdminRoute) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900 p-4">
+        <main className="max-w-4xl mx-auto py-8">
           {!isAuthenticated ? (
-            <AdminLogin
-              onLogin={async (email, pass) => {
-                await signIn(email, pass);
-              }}
-            />
+            <div>
+              <div className="mb-4 text-center">
+                <button
+                  onClick={() => navigateTo('/')}
+                  className="text-xs text-gray-500 hover:text-gray-800 underline"
+                >
+                  ← Volver al Menú de Clientes
+                </button>
+              </div>
+              <AdminLogin
+                onLogin={async (email, pass) => {
+                  await signIn(email, pass);
+                }}
+              />
+            </div>
           ) : (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
@@ -233,7 +119,14 @@ export default function App() {
                   </p>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigateTo('/')}
+                  >
+                    Ver Menú Cliente
+                  </Button>
                   <Button
                     variant="primary"
                     size="sm"
@@ -278,7 +171,114 @@ export default function App() {
             </div>
           )}
         </main>
-      )}
+      </div>
+    );
+  }
+
+  // ========================================================
+  // RUTA PÚBLICA (/): VISTA ÚNICA Y EXCLUSIVA PARA COMENSAL
+  // ========================================================
+  return (
+    <div className="min-h-screen dot-pattern text-gray-900 pb-28">
+      <TopHeader />
+
+      <main className="max-w-md mx-auto">
+        <HomeHero onExplore={scrollToMenu} />
+
+        <section id="menu-catalog" className="px-4 pt-4">
+          {/* Barra de Categorías obtenidas de Supabase */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+              {isLoadingCategories ? (
+                <span className="text-xs text-gray-400 py-1">Cargando categorías...</span>
+              ) : dbCategories.length === 0 ? (
+                <span className="text-xs text-gray-400 py-1">No hay categorías registradas</span>
+              ) : (
+                dbCategories.map((cat) => {
+                  const isSelected = selectedCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`font-serif text-lg sm:text-xl font-bold transition-all px-1 capitalize whitespace-nowrap ${
+                        isSelected
+                          ? 'text-gray-900 border-b-2 border-gray-900'
+                          : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Switch Cuadrícula / Lista */}
+            <div className="flex items-center bg-white border border-gray-200 rounded-xl p-0.5 shadow-2xs">
+              <button
+                onClick={() => setIsLargeView(false)}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  !isLargeView ? 'bg-black text-white' : 'text-gray-400'
+                }`}
+                title="Cuadrícula"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setIsLargeView(true)}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isLargeView ? 'bg-black text-white' : 'text-gray-400'
+                }`}
+                title="Vista Grande"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Catálogo de Platillos desde Supabase */}
+          {isLoadingDishes ? (
+            <div className="py-12 text-center text-xs text-gray-400">
+              Cargando menú en vivo desde Supabase...
+            </div>
+          ) : currentCategoryDishes.length === 0 ? (
+            <div className="py-12 text-center text-xs text-gray-400 bg-white rounded-3xl border border-gray-100 p-6">
+              No hay platos disponibles en esta categoría.
+            </div>
+          ) : (
+            <div
+              className={`grid gap-3.5 ${
+                isLargeView ? 'grid-cols-1' : 'grid-cols-2'
+              }`}
+            >
+              {currentCategoryDishes.map((dish) => (
+                <DishCard
+                  key={dish.id}
+                  dish={dish}
+                  isLargeView={isLargeView}
+                  onSelect={(d: Dish) => setSelectedDish(d)}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <DishDetailModal
+          dish={selectedDish}
+          onClose={() => setSelectedDish(null)}
+        />
+
+        <CartDrawer />
+
+        <FloatingBar
+          isLargeView={isLargeView}
+          onToggleLargeView={() => setIsLargeView(!isLargeView)}
+        />
+      </main>
     </div>
   );
 }
