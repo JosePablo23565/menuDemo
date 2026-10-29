@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useKitchenOrders, useUpdateOrderStatus } from '../../hooks/useMenu';
+import { useKitchenOrders, useUpdateOrderStatus, useDeleteOrder } from '../../hooks/useMenu';
 import { formatPrice } from '../../lib/utils';
 import type { OrderStatus } from '../../types/database';
 
 export const KitchenDisplaySystem: React.FC = () => {
   const { data: orders = [], isLoading } = useKitchenOrders();
   const updateStatusMutation = useUpdateOrderStatus();
+  const deleteOrderMutation = useDeleteOrder();
   const [filter, setFilter] = useState<'TODOS' | 'NUEVOS' | 'EN_CURSO' | 'LISTOS'>('TODOS');
 
   const filteredOrders = orders.filter((o) => {
@@ -17,6 +18,12 @@ export const KitchenDisplaySystem: React.FC = () => {
 
   const handleUpdateStatus = (orderId: string, nextStatus: OrderStatus) => {
     updateStatusMutation.mutate({ orderId, status: nextStatus });
+  };
+
+  const handleDeleteOrder = (orderId: string, tableName: string) => {
+    if (confirm(`¿Deseas eliminar la comanda de ${tableName}? Esta acción no se puede deshacer.`)) {
+      deleteOrderMutation.mutate(orderId);
+    }
   };
 
   const formatOrderTime = (isoString?: string) => {
@@ -73,7 +80,7 @@ export const KitchenDisplaySystem: React.FC = () => {
             return (
               <div
                 key={order.id}
-                className="bg-white rounded-3xl p-5 border border-gray-100/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden"
+                className="bg-white rounded-3xl p-5 border border-gray-100/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group"
               >
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-dashed border-gray-100">
@@ -88,21 +95,34 @@ export const KitchenDisplaySystem: React.FC = () => {
                       )}
                     </div>
 
-                    {isNuevo && (
-                      <span className="bg-[#1C3F32] text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider animate-pulse">
-                        Nuevo
-                      </span>
-                    )}
-                    {isEnCurso && (
-                      <span className="bg-[#FEF08A] text-amber-900 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider">
-                        En curso
-                      </span>
-                    )}
-                    {isListo && (
-                      <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider">
-                        Listo
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {isNuevo && (
+                        <span className="bg-[#1C3F32] text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider animate-pulse">
+                          Nuevo
+                        </span>
+                      )}
+                      {isEnCurso && (
+                        <span className="bg-[#FEF08A] text-amber-900 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider">
+                          En curso
+                        </span>
+                      )}
+                      {isListo && (
+                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider">
+                          Listo
+                        </span>
+                      )}
+
+                      {/* Botón Eliminar / Cancelar Comanda */}
+                      <button
+                        onClick={() => handleDeleteOrder(order.id, order.tableNumber)}
+                        className="w-7 h-7 rounded-full bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-600 flex items-center justify-center transition-colors"
+                        title="Eliminar pedido"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="py-4 space-y-2.5">
@@ -124,32 +144,34 @@ export const KitchenDisplaySystem: React.FC = () => {
                     {formatPrice(order.totalCRC, 'CRC')}
                   </span>
 
-                  {isNuevo && (
-                    <button
-                      onClick={() => handleUpdateStatus(order.id, 'en_curso')}
-                      className="bg-[#1C3F32] hover:bg-[#142e25] text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all active:scale-95"
-                    >
-                      Iniciar pedido
-                    </button>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {isNuevo && (
+                      <button
+                        onClick={() => handleUpdateStatus(order.id, 'en_curso')}
+                        className="bg-[#1C3F32] hover:bg-[#142e25] text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all active:scale-95"
+                      >
+                        Iniciar pedido
+                      </button>
+                    )}
 
-                  {isEnCurso && (
-                    <button
-                      onClick={() => handleUpdateStatus(order.id, 'listo')}
-                      className="bg-[#D97706] hover:bg-[#b45309] text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all active:scale-95"
-                    >
-                      Marcar listo
-                    </button>
-                  )}
+                    {isEnCurso && (
+                      <button
+                        onClick={() => handleUpdateStatus(order.id, 'listo')}
+                        className="bg-[#D97706] hover:bg-[#b45309] text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all active:scale-95"
+                      >
+                        Marcar listo
+                      </button>
+                    )}
 
-                  {isListo && (
-                    <button
-                      onClick={() => handleUpdateStatus(order.id, 'entregado')}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95"
-                    >
-                      Archivar
-                    </button>
-                  )}
+                    {isListo && (
+                      <button
+                        onClick={() => handleUpdateStatus(order.id, 'entregado')}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95"
+                      >
+                        Archivar
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );

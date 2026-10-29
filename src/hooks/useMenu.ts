@@ -152,7 +152,6 @@ export function useCreateOrder() {
 export function useKitchenOrders() {
   const queryClient = useQueryClient();
 
-  // Suscripción Realtime por WebSockets
   useEffect(() => {
     const channel = supabase
       .channel('kds-orders-realtime')
@@ -170,7 +169,7 @@ export function useKitchenOrders() {
     };
   }, [queryClient]);
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ['orders'],
     queryFn: async (): Promise<KitchenOrder[]> => {
       const { data, error } = await supabase
@@ -195,12 +194,10 @@ export function useKitchenOrders() {
     },
     staleTime: 1000 * 10,
   });
-
-  return query;
 }
 
 /**
- * Hook para actualizar el estado del pedido en cocina (ej: nuevo -> en_curso -> listo)
+ * Hook para actualizar el estado del pedido en cocina
  */
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
@@ -216,6 +213,24 @@ export function useUpdateOrderStatus() {
 
       if (error) throw new Error(error.message);
       return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
+}
+
+/**
+ * Hook para eliminar/cancelar un pedido de cocina
+ */
+export function useDeleteOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (orderId: string) => {
+      const { error } = await supabase.from('orders').delete().eq('id', orderId);
+      if (error) throw new Error(error.message);
+      return orderId;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });

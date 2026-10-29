@@ -3,12 +3,21 @@ import { useMenuStore } from '../../store/useMenuStore';
 import type { Currency, Language } from '../../types/database';
 
 export const TopHeader: React.FC = () => {
-  const { currency, setCurrency, language, setLanguage } = useMenuStore();
+  const {
+    currency,
+    setCurrency,
+    language,
+    setLanguage,
+    getTotalItemsCount,
+    setIsCartOpen,
+  } = useMenuStore();
+
+  const totalItems = getTotalItemsCount();
 
   return (
     <header className="w-full bg-[#FBFBF9] border-b border-gray-100/80 px-4 pt-3 pb-2 sticky top-0 z-40">
       <div className="max-w-md mx-auto">
-        {/* Logo / Nombre del restaurante */}
+        {/* Fila Superior: Logo y Botón Carrito */}
         <div className="flex items-center justify-between pb-3">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full border border-gray-800 flex items-center justify-center">
@@ -23,9 +32,21 @@ export const TopHeader: React.FC = () => {
             </div>
           </div>
 
-          <div className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-            Menú Digital
-          </div>
+          {/* Botón Carrito en lugar del texto "Menú Digital" */}
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-white border border-gray-200/90 text-gray-800 hover:bg-gray-50 active:scale-95 transition-all shadow-xs"
+            aria-label="Abrir pedido"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-5 h-5 px-1 bg-[#1C3F32] text-white text-[10px] font-bold rounded-full border-2 border-[#FBFBF9] animate-scale-in">
+                {totalItems}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Selectores de Idioma y Moneda en píldoras */}
@@ -50,7 +71,7 @@ export const TopHeader: React.FC = () => {
             </div>
           </div>
 
-          {/* Selector de Moneda: CRC y USD */}
+          {/* Selector de Moneda */}
           <div>
             <label className="block text-[11px] text-gray-400 mb-1 font-medium">Moneda</label>
             <div className="relative">
