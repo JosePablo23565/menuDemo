@@ -101,9 +101,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   return (
     <aside className="w-64 bg-white border-r border-gray-100 flex flex-col justify-between shrink-0 h-screen sticky top-0 p-5 shadow-xs">
       <div>
-        {/* Logo Oficial Casa Tamarindo */}
-        <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 rounded-full overflow-hidden shadow-xs border border-gray-200/80 shrink-0 bg-[#36432b]">
+        {/* Logo Oficial Casa Tamarindo más grande y sin la etiqueta 'Panel Admin' */}
+        <div className="flex items-center gap-3.5 mb-8 px-2">
+          <div className="w-12 h-12 rounded-full overflow-hidden shadow-xs border border-gray-200/80 shrink-0 bg-[#36432b]">
             <img
               src="/logo.png"
               alt="Casa Tamarindo"
@@ -111,11 +111,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             />
           </div>
           <div>
-            <span className="font-serif text-lg font-bold tracking-tight text-gray-900 block leading-tight">
+            <span className="font-serif text-xl font-bold tracking-tight text-gray-900 block leading-tight">
               Casa Tamarindo
-            </span>
-            <span className="text-[10px] text-gray-400 font-semibold tracking-wider">
-              PANEL ADMIN
             </span>
           </div>
         </div>
@@ -160,7 +157,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <div className="px-2 flex items-center justify-between text-xs">
           <div>
             <p className="font-bold text-gray-900 text-xs">Casa Tamarindo</p>
-            <p className="text-[10px] text-gray-400">Tel: 6045-4528</p>
           </div>
           <button
             onClick={onLogout}

@@ -15,26 +15,23 @@ export const TopHeader: React.FC = () => {
   const totalItems = getTotalItemsCount();
 
   return (
-    <header className="w-full bg-[#FBFBF9] border-b border-gray-100/80 px-4 pt-3 pb-2 sticky top-0 z-40">
+    <header className="w-full bg-[#FBFBF9] border-b border-gray-100/80 px-4 pt-3.5 pb-2.5 sticky top-0 z-40">
       <div className="max-w-md mx-auto">
-        {/* Fila Superior: Logo Oficial Casa Tamarindo y Botón Carrito */}
-        <div className="flex items-center justify-between pb-3">
-          <div className="flex items-center gap-2.5">
-            {/* Logotipo redondo nítido con sombra suave */}
-            <div className="w-10 h-10 rounded-full overflow-hidden shadow-xs border border-gray-200/80 shrink-0 bg-[#36432b]">
+        {/* Fila Superior: Logo destacado y Botón Carrito */}
+        <div className="flex items-center justify-between pb-3.5">
+          <div className="flex items-center gap-3">
+            {/* Logotipo con mayor tamaño (w-14 h-14 / 56px) para que sus detalles y texto se lean claramente */}
+            <div className="w-14 h-14 rounded-full overflow-hidden shadow-sm border border-black/10 shrink-0 bg-[#36432b]">
               <img
                 src="/logo.png"
                 alt="Casa Tamarindo"
-                className="w-full h-full object-cover rendering-crisp"
+                className="w-full h-full object-cover"
                 loading="eager"
               />
             </div>
             <div>
-              <span className="font-serif text-lg font-bold tracking-tight text-gray-900 block leading-tight">
+              <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-gray-900 block leading-tight">
                 Casa Tamarindo
-              </span>
-              <span className="text-[10px] text-gray-400 font-medium tracking-wide">
-                Tel: 6045-4528
               </span>
             </div>
           </div>
@@ -42,7 +39,7 @@ export const TopHeader: React.FC = () => {
           {/* Botón Carrito */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-white border border-gray-200/90 text-gray-800 hover:bg-gray-50 active:scale-95 transition-all shadow-xs"
+            className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-white border border-gray-200/90 text-gray-800 hover:bg-gray-50 active:scale-95 transition-all shadow-xs"
             aria-label="Abrir pedido"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
