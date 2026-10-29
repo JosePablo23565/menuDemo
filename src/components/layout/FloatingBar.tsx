@@ -1,22 +1,23 @@
 import React from 'react';
-import { useMenuStore } from '../../store/useMenuStore';
-import { RESTAURANT_DATA } from '../../lib/data';
 
 interface FloatingBarProps {
   isLargeView: boolean;
   onToggleLargeView: () => void;
+  whatsappNumber?: string;
 }
 
 export const FloatingBar: React.FC<FloatingBarProps> = ({
   isLargeView,
   onToggleLargeView,
+  whatsappNumber,
 }) => {
-  const { getTotalItemsCount, setIsCartOpen } = useMenuStore();
-  const totalItems = getTotalItemsCount();
-
   const handleWhatsApp = () => {
-    const text = encodeURIComponent('¡Hola La Terraza! Quisiera consultar sobre el menú.');
-    window.open(`https://wa.me/${RESTAURANT_DATA.whatsappNumber}?text=${text}`, '_blank');
+    if (!whatsappNumber) {
+      alert('Número de WhatsApp no configurado aún en el restaurante.');
+      return;
+    }
+    const text = encodeURIComponent('¡Hola! Quisiera consultar sobre el menú.');
+    window.open(`https://wa.me/${whatsappNumber}?text=${text}`, '_blank');
   };
 
   return (
@@ -35,18 +36,7 @@ export const FloatingBar: React.FC<FloatingBarProps> = ({
         </button>
 
         <div className="flex items-center gap-2.5">
-          {/* Botón Pedido Flotante si hay items */}
-          {totalItems > 0 && (
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="bg-brand-yellow-badge text-gray-900 px-3.5 py-2.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-xl hover:bg-brand-yellow transition-all active:scale-95 border border-yellow-300"
-            >
-              <span>🛒</span>
-              <span>{totalItems}</span>
-            </button>
-          )}
-
-          {/* Botón Circular Verde de WhatsApp (Imagen 1 y 5) */}
+          {/* Botón Circular Verde de WhatsApp */}
           <button
             onClick={handleWhatsApp}
             className="w-11 h-11 rounded-full bg-[#1C3F32] hover:bg-[#152e25] text-white flex items-center justify-center shadow-xl transition-all active:scale-95"

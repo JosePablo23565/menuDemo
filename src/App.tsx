@@ -6,7 +6,6 @@ import { TopHeader } from './components/layout/TopHeader';
 import { HomeHero } from './components/menu/HomeHero';
 import { DishCard } from './components/menu/DishCard';
 import { DishDetailModal } from './components/menu/DishDetailModal';
-import { PromoModal } from './components/menu/PromoModal';
 import { CartDrawer } from './components/menu/CartDrawer';
 import { FloatingBar } from './components/layout/FloatingBar';
 import { AdminLogin } from './components/admin/AdminLogin';
@@ -21,19 +20,17 @@ export default function App() {
     syncTableFromUrl,
     selectedDish,
     setSelectedDish,
-    isPromoOpen,
-    setIsPromoOpen,
   } = useMenuStore();
 
   const { isAuthenticated, signIn, signOut } = useAuth();
 
-  // Queries desde Supabase en tiempo real
-  const { data: dbCategories = [] } = useCategories();
-  const { data: dbDishes = [] } = useDishes({ onlyAvailable: false });
+  // Queries directas desde Supabase (100% dinámicas, 0 datos quemados)
+  const { data: dbCategories = [], isLoading: isLoadingCategories } = useCategories();
+  const { data: dbDishes = [], isLoading: isLoadingDishes } = useDishes({ onlyAvailable: false });
   const upsertDishMutation = useUpsertDish();
   const deleteDishMutation = useDeleteDish();
 
-  // Navegación de vistas
+  // Navegación de pestañas
   const [activeTab, setActiveTab] = useState<'menu' | 'admin'>('menu');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isLargeView, setIsLargeView] = useState(false);
@@ -46,14 +43,14 @@ export default function App() {
     syncTableFromUrl();
   }, [syncTableFromUrl]);
 
-  // Si hay categorías de la base de datos y ninguna seleccionada, elegir la primera
+  // Seleccionar la primera categoría que llegue de la base de datos
   useEffect(() => {
     if (dbCategories.length > 0 && !selectedCategory) {
       setSelectedCategory(dbCategories[0].id);
     }
   }, [dbCategories, selectedCategory]);
 
-  // Filtrado de platos para comensales (solo disponibles)
+  // Filtrado de comensales (solo disponibles)
   const availableDishes = dbDishes.filter((d) => d.isAvailable);
   const currentCategoryDishes = selectedCategory
     ? availableDishes.filter((d) => d.categoryId === selectedCategory)
@@ -117,25 +114,31 @@ export default function App() {
             <HomeHero onExplore={scrollToMenu} />
 
             <section id="menu-catalog" className="px-4 pt-4">
-              {/* Barra de Categorías */}
+              {/* Barra de Categorías obtenidas de Supabase */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                  {dbCategories.map((cat) => {
-                    const isSelected = selectedCategory === cat.id;
-                    return (
-                      <button
-                        key={cat.id}
-                        onClick={() => setSelectedCategory(cat.id)}
-                        className={`font-serif text-lg sm:text-xl font-bold transition-all px-1 capitalize whitespace-nowrap ${
-                          isSelected
-                            ? 'text-gray-900 border-b-2 border-gray-900'
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
-                      >
-                        {cat.name}
-                      </button>
-                    );
-                  })}
+                  {isLoadingCategories ? (
+                    <span className="text-xs text-gray-400 py-1">Cargando categorías...</span>
+                  ) : dbCategories.length === 0 ? (
+                    <span className="text-xs text-gray-400 py-1">No hay categorías registradas</span>
+                  ) : (
+                    dbCategories.map((cat) => {
+                      const isSelected = selectedCategory === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => setSelectedCategory(cat.id)}
+                          className={`font-serif text-lg sm:text-xl font-bold transition-all px-1 capitalize whitespace-nowrap ${
+                            isSelected
+                              ? 'text-gray-900 border-b-2 border-gray-900'
+                              : 'text-gray-400 hover:text-gray-600'
+                          }`}
+                        >
+                          {cat.name}
+                        </button>
+                      );
+                    })
+                  )}
                 </div>
 
                 {/* Switch Cuadrícula / Lista */}
@@ -165,35 +168,36 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Catálogo en 2 columnas */}
-              <div
-                className={`grid gap-3.5 ${
-                  isLargeView ? 'grid-cols-1' : 'grid-cols-2'
-                }`}
-              >
-                {currentCategoryDishes.map((dish) => (
-                  <DishCard
-                    key={dish.id}
-                    dish={dish}
-                    isLargeView={isLargeView}
-                    onSelect={(d: Dish) => setSelectedDish(d)}
-                  />
-                ))}
-              </div>
+              {/* Catálogo de Platillos desde Supabase */}
+              {isLoadingDishes ? (
+                <div className="py-12 text-center text-xs text-gray-400">
+                  Cargando menú en vivo desde Supabase...
+                </div>
+              ) : currentCategoryDishes.length === 0 ? (
+                <div className="py-12 text-center text-xs text-gray-400 bg-white rounded-3xl border border-gray-100 p-6">
+                  No hay platos disponibles en esta categoría.
+                </div>
+              ) : (
+                <div
+                  className={`grid gap-3.5 ${
+                    isLargeView ? 'grid-cols-1' : 'grid-cols-2'
+                  }`}
+                >
+                  {currentCategoryDishes.map((dish) => (
+                    <DishCard
+                      key={dish.id}
+                      dish={dish}
+                      isLargeView={isLargeView}
+                      onSelect={(d: Dish) => setSelectedDish(d)}
+                    />
+                  ))}
+                </div>
+              )}
             </section>
 
             <DishDetailModal
               dish={selectedDish}
               onClose={() => setSelectedDish(null)}
-            />
-
-            <PromoModal
-              isOpen={isPromoOpen}
-              onClose={() => setIsPromoOpen(false)}
-              onExploreCocktails={() => {
-                const coctelesCat = dbCategories.find((c) => c.slug === 'cocteles');
-                if (coctelesCat) setSelectedCategory(coctelesCat.id);
-              }}
             />
 
             <CartDrawer />
@@ -225,7 +229,7 @@ export default function App() {
                     Administración de Menú
                   </h1>
                   <p className="text-xs text-gray-500 mt-1">
-                    Conectado en vivo a Supabase ({dbDishes.length} platillos registrados)
+                    Conectado en vivo a Supabase ({dbDishes.length} platillos en BD)
                   </p>
                 </div>
 

@@ -15,7 +15,7 @@ interface MenuState {
   // Carrito / Pedido de la mesa
   cart: TableCartItem[];
   isCartOpen: boolean;
-  selectedDish: Dish | null; // Modal de detalle de plato
+  selectedDish: Dish | null;
   isPromoOpen: boolean;
 
   // Acciones
@@ -41,8 +41,7 @@ interface MenuState {
 }
 
 const DEFAULT_DINERS: Diner[] = [
-  { id: 'diner-1', name: 'Luis (tú)', isSelf: true, hasPhone: true },
-  { id: 'diner-2', name: 'Abuela', hasPhone: false },
+  { id: 'diner-1', name: 'Comensal 1 (tú)', isSelf: true, hasPhone: true },
 ];
 
 export const useMenuStore = create<MenuState>()(
@@ -53,17 +52,7 @@ export const useMenuStore = create<MenuState>()(
       tableNumber: null,
       diners: DEFAULT_DINERS,
       activeDinerId: 'diner-1',
-      cart: [
-        {
-          id: 'item-demo-1',
-          dishId: 'p-arepa',
-          name: 'AREPA DE QUESO CALLEJERA',
-          priceCOP: 21000,
-          priceUSD: 5.5,
-          quantity: 1,
-          dinerId: 'diner-2', // Asignado a Abuela como en la captura
-        },
-      ],
+      cart: [], // Carrito limpio sin datos quemados
       isCartOpen: false,
       selectedDish: null,
       isPromoOpen: false,

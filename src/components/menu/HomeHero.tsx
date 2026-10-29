@@ -1,37 +1,41 @@
 import React from 'react';
-import { RESTAURANT_DATA } from '../../lib/data';
 
 interface HomeHeroProps {
   onExplore: () => void;
+  title?: string;
+  subtitle?: string;
+  tagline?: string;
 }
 
-export const HomeHero: React.FC<HomeHeroProps> = ({ onExplore }) => {
+export const HomeHero: React.FC<HomeHeroProps> = ({
+  onExplore,
+  title = 'El gusto de estar aquí.',
+  subtitle = 'Cocina para compartir. Un buen plato, una buena conversación.',
+  tagline = 'A LA MESA, SIN AFÁN',
+}) => {
   return (
     <div className="w-full max-w-md mx-auto p-4">
       {/* Tarjeta oscura elegante idéntica a la Imagen 1 */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-b from-[#2C2E2D] to-[#171818] text-white p-7 shadow-xl min-h-[380px] flex flex-col justify-between border border-white/5">
-        {/* Grano / Textura sutil y fondo de restaurante */}
         <div className="absolute inset-0 opacity-20 bg-cover bg-center pointer-events-none mix-blend-overlay" />
 
-        {/* Encabezado */}
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span className="text-[11px] font-semibold tracking-widest text-gray-300 uppercase">
-              {RESTAURANT_DATA.tagline}
+              {tagline}
             </span>
           </div>
 
           <h1 className="font-serif text-3xl sm:text-4xl font-normal leading-[1.15] text-white tracking-tight mt-1">
-            {RESTAURANT_DATA.title}
+            {title}
           </h1>
 
           <p className="text-gray-300 text-xs sm:text-sm font-sans mt-4 leading-relaxed max-w-xs">
-            {RESTAURANT_DATA.subtitle}
+            {subtitle}
           </p>
         </div>
 
-        {/* Botón Explorar el menú en color crema/amarillento suave */}
         <div className="relative z-10 pt-6">
           <button
             onClick={onExplore}
