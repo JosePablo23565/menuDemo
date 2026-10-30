@@ -44,12 +44,18 @@ export const OrderStatusBanner: React.FC = () => {
   const currentTotal = currency === 'CRC' ? order.totalCRC : order.totalUSD;
   const totalItemsCount = order.items.reduce((acc, i) => acc + i.quantity, 0);
 
+  const handleWhatsAppHelp = () => {
+    const table = order.tableNumber || 'Mesa';
+    const text = encodeURIComponent(`¡Hola Casa Tamarindo! Quisiera consultar sobre el pedido de ${table}.`);
+    window.open(`https://wa.me/50660454528?text=${text}`, '_blank');
+  };
+
   return (
     <>
-      {/* Barra fija inferior sobria y minimalista: sin emojis ni saturación */}
-      <div className="fixed bottom-20 inset-x-0 z-30 px-4 pointer-events-none">
+      {/* Barra fija inferior sobria y minimalista anclada a la base */}
+      <div className="fixed bottom-4 sm:bottom-6 inset-x-0 z-30 px-4 pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
-          <div className="bg-[#1C3F32] text-white px-4 py-2.5 rounded-2xl shadow-xl flex items-center justify-between border border-emerald-900/40">
+          <div className="bg-[#1C3F32] text-white px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between border border-emerald-900/40 backdrop-blur-md">
             <div className="flex items-center gap-2.5 min-w-0 pr-2">
               <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusConfig.dotColor}`} />
               <div className="truncate">
@@ -64,7 +70,7 @@ export const OrderStatusBanner: React.FC = () => {
 
             <button
               onClick={() => setIsOrderModalOpen(true)}
-              className="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition-all shrink-0"
+              className="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl transition-all shrink-0 border border-white/10"
             >
               Ver
             </button>
@@ -109,7 +115,20 @@ export const OrderStatusBanner: React.FC = () => {
             <span>{formatPrice(currentTotal, currency)}</span>
           </div>
 
-          <div className="pt-3 flex gap-2">
+          {/* Asistencia contextual por WhatsApp */}
+          <div className="pt-1">
+            <button
+              onClick={handleWhatsAppHelp}
+              className="w-full flex items-center justify-center gap-2 bg-[#1C3F32]/10 hover:bg-[#1C3F32]/15 active:scale-[0.99] text-[#1C3F32] py-2.5 px-4 rounded-xl font-semibold text-xs transition-all border border-[#1C3F32]/15"
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <span>Consultar al restaurante por WhatsApp</span>
+            </button>
+          </div>
+
+          <div className="pt-2 flex gap-2">
             <button
               onClick={() => setIsOrderModalOpen(false)}
               className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-xl font-semibold transition-colors"

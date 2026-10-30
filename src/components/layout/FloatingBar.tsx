@@ -1,4 +1,6 @@
 import React from 'react';
+import { useMenuStore } from '../../store/useMenuStore';
+import { useActiveClientOrder } from '../../hooks/useMenu';
 
 interface FloatingBarProps {
   isLargeView?: boolean;
@@ -9,6 +11,15 @@ interface FloatingBarProps {
 export const FloatingBar: React.FC<FloatingBarProps> = ({
   whatsappNumber = '50660454528', // Número oficial Casa Tamarindo
 }) => {
+  const { activeOrderId } = useMenuStore();
+  const { data: order } = useActiveClientOrder(activeOrderId);
+
+  // Si hay un pedido activo no entregado, se oculta el botón flotante
+  // para no generar colisiones de capas ni tapar los platillos inferiores
+  if (order && order.status !== 'entregado') {
+    return null;
+  }
+
   const handleWhatsApp = () => {
     const text = encodeURIComponent('¡Hola Casa Tamarindo! Quisiera consultar sobre el menú.');
     window.open(`https://wa.me/${whatsappNumber}?text=${text}`, '_blank');
@@ -16,7 +27,6 @@ export const FloatingBar: React.FC<FloatingBarProps> = ({
 
   return (
     <aside className="fixed bottom-5 right-5 z-40 pointer-events-auto" aria-label="Contacto directo">
-      {/* Botón Circular Verde de WhatsApp Casa Tamarindo en esquina sin tapar platillos */}
       <button
         onClick={handleWhatsApp}
         className="w-12 h-12 rounded-full bg-[#1C3F32] hover:bg-[#152e25] text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-150 active:scale-95 border border-white/20"

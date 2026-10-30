@@ -105,29 +105,15 @@ export const KitchenDisplaySystem: React.FC = () => {
 
                 <div>
                   {/* Cabecera de la comanda: Mesa y Hora */}
-                  <div className="pb-3 border-b border-gray-100 pr-8 flex items-baseline justify-between">
-                    <div>
-                      <h3 className="font-serif text-2xl font-bold text-gray-900 tracking-tight">
-                        {order.tableNumber}
-                      </h3>
-                      {order.createdAt && (
-                        <span className="text-[11px] text-gray-400 font-medium">
-                          Hora: {formatOrderTime(order.createdAt)}
-                        </span>
-                      )}
-                    </div>
-
-                    <span
-                      className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                        isNuevo
-                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                          : isEnCurso
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 animate-pulse'
-                          : 'bg-stone-100 text-gray-700'
-                      }`}
-                    >
-                      {isNuevo ? 'Nuevo' : isEnCurso ? 'Preparando' : 'Listo'}
-                    </span>
+                  <div className="pb-3 border-b border-gray-100 pr-8">
+                    <h3 className="font-serif text-2xl font-bold text-gray-900 tracking-tight">
+                      {order.tableNumber}
+                    </h3>
+                    {order.createdAt && (
+                      <span className="text-xs text-gray-400 font-medium mt-0.5 block">
+                        Hora: {formatOrderTime(order.createdAt)}
+                      </span>
+                    )}
                   </div>
 
                   {/* Lista de productos con cantidades destacadas en alta legibilidad para cocina */}
@@ -137,7 +123,7 @@ export const KitchenDisplaySystem: React.FC = () => {
                         <span className="font-mono text-sm font-extrabold text-[#1C3F32] bg-emerald-50/80 border border-emerald-100 w-8 h-8 rounded-xl flex items-center justify-center shrink-0">
                           {item.quantity}×
                         </span>
-                        <span className="font-semibold text-gray-900 text-xs sm:text-sm tracking-wide uppercase">
+                        <span className="font-semibold text-gray-900 text-sm tracking-wide uppercase">
                           {item.name}
                         </span>
                       </div>
@@ -145,17 +131,20 @@ export const KitchenDisplaySystem: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Footer de la comanda con Total y Botones de acción táctiles para cocina */}
-                <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto">
-                  <span className="font-mono font-bold text-xs text-gray-600">
-                    {formatPrice(order.totalCRC, 'CRC')}
-                  </span>
+                {/* Footer de la comanda con Total destacado y Botón de acción */}
+                <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-3 mt-auto">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Total</span>
+                    <span className="font-mono font-bold text-base sm:text-lg text-gray-900 tabular-nums">
+                      {formatPrice(order.totalCRC, 'CRC')}
+                    </span>
+                  </div>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {isNuevo && (
                       <button
                         onClick={() => handleUpdateStatus(order.id, 'en_curso')}
-                        className="bg-[#1C3F32] hover:bg-[#152e25] active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition-transform"
+                        className="bg-[#1C3F32] hover:bg-[#152e25] active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-xs transition-transform"
                       >
                         Iniciar preparación
                       </button>
@@ -164,7 +153,7 @@ export const KitchenDisplaySystem: React.FC = () => {
                     {isEnCurso && (
                       <button
                         onClick={() => handleUpdateStatus(order.id, 'listo')}
-                        className="bg-amber-600 hover:bg-amber-700 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs transition-transform"
+                        className="bg-amber-600 hover:bg-amber-700 active:scale-95 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-xs transition-transform"
                       >
                         Marcar listo
                       </button>
@@ -173,7 +162,7 @@ export const KitchenDisplaySystem: React.FC = () => {
                     {isListo && (
                       <button
                         onClick={() => handleUpdateStatus(order.id, 'entregado')}
-                        className="bg-stone-100 hover:bg-stone-200 active:scale-95 text-gray-800 px-4 py-2.5 rounded-xl text-xs font-bold border border-black/[0.05] transition-transform"
+                        className="bg-stone-100 hover:bg-stone-200 active:scale-95 text-gray-800 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold border border-black/[0.05] transition-transform"
                       >
                         Archivar comanda
                       </button>
