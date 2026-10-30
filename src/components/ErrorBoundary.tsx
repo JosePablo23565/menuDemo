@@ -21,6 +21,16 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error no controlado en la aplicación:', error, errorInfo);
+    // Auto-recuperación transparente: si la caché o sesión previa tenía datos desactualizados,
+    // limpia automáticamente y recarga al instante sin molestar al cliente
+    try {
+      const recovered = sessionStorage.getItem('ct_auto_recovered');
+      if (!recovered) {
+        sessionStorage.setItem('ct_auto_recovered', 'true');
+        localStorage.removeItem('la-terraza-session');
+        window.location.reload();
+      }
+    } catch {}
   }
 
   private handleReset = () => {

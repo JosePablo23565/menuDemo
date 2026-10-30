@@ -8,17 +8,18 @@ export function cn(...inputs: ClassValue[]): string {
 }
 
 export function formatPrice(amount: number, currency: Currency): string {
+  const safeAmount = Number.isFinite(amount) ? amount : 0;
   if (currency === 'CRC') {
     const formatted = new Intl.NumberFormat('es-CR', {
       maximumFractionDigits: 0,
-    }).format(amount);
+    }).format(safeAmount);
     return `CRC ${formatted}`;
   }
 
   const formatted = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount);
+  }).format(safeAmount);
   return `USD ${formatted}`;
 }
 
