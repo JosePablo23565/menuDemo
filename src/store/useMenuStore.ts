@@ -50,6 +50,30 @@ const DEFAULT_DINERS: Diner[] = [
   { id: 'diner-1', name: 'Comensal 1 (tú)', isSelf: true, hasPhone: true },
 ];
 
+const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, value);
+      }
+    } catch {}
+  },
+  removeItem: (key: string): void => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(key);
+      }
+    } catch {}
+  },
+};
+
 export const useMenuStore = create<MenuState>()(
   persist(
     (set, get) => ({
@@ -188,7 +212,7 @@ export const useMenuStore = create<MenuState>()(
     }),
     {
       name: 'la-terraza-session',
-      storage: createJSONStorage(() => localStorage), // Persistido en localStorage contra recargas
+      storage: createJSONStorage(() => safeStorage), // Persistido de forma segura contra bloqueos de WebView o modo incógnito
       partialize: (state) => ({
         currency: state.currency,
         language: state.language,
