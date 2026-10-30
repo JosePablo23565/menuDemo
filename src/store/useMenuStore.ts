@@ -83,7 +83,9 @@ export const useMenuStore = create<MenuState>()(
         if (typeof window === 'undefined') return;
         const params = new URLSearchParams(window.location.search);
         const mesa = params.get('mesa') || params.get('table');
-        if (mesa) set({ tableNumber: mesa.trim() });
+        if (mesa && get().tableNumber !== mesa.trim()) {
+          set({ tableNumber: mesa.trim() });
+        }
       },
 
       setIsCartOpen: (isCartOpen) => set({ isCartOpen }),

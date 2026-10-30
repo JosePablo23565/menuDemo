@@ -1,22 +1,19 @@
 import React from 'react';
-import { useMenuStore } from '../../store/useMenuStore';
-import { useActiveClientOrder } from '../../hooks/useMenu';
 
 interface FloatingBarProps {
   isLargeView?: boolean;
   onToggleLargeView?: () => void;
   whatsappNumber?: string;
+  hasActiveOrder?: boolean;
 }
 
 export const FloatingBar: React.FC<FloatingBarProps> = ({
   whatsappNumber = '50660454528', // Número oficial Casa Tamarindo
+  hasActiveOrder = false,
 }) => {
-  const { activeOrderId } = useMenuStore();
-  const { data: order } = useActiveClientOrder(activeOrderId);
-
   // Si hay un pedido activo no entregado, se oculta el botón flotante
   // para no generar colisiones de capas ni tapar los platillos inferiores
-  if (order && order.status !== 'entregado') {
+  if (hasActiveOrder) {
     return null;
   }
 

@@ -2,8 +2,19 @@ import React, { useState } from 'react';
 
 export const QrGenerator: React.FC = () => {
   const [selectedTable, setSelectedTable] = useState<number>(1);
-  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-  const qrUrl = `${currentOrigin}/?mesa=${selectedTable}`;
+  
+  // Si estamos en entorno local, el QR debe apuntar a la URL pública de producción
+  // para que cualquier teléfono que lo escanee pueda acceder sin error de localhost
+  const isLocal = typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1'
+  );
+
+  const baseUrl = isLocal
+    ? 'https://menudemo-akw.pages.dev'
+    : (typeof window !== 'undefined' ? window.location.origin : 'https://menudemo-akw.pages.dev');
+
+  const qrUrl = `${baseUrl}/?mesa=${selectedTable}`;
 
   return (
     <div className="space-y-6">

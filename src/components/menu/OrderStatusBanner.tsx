@@ -3,8 +3,13 @@ import { useMenuStore } from '../../store/useMenuStore';
 import { useActiveClientOrder } from '../../hooks/useMenu';
 import { formatPrice } from '../../lib/utils';
 import { Modal } from '../ui/Modal';
+import type { KitchenOrder } from '../../types/database';
 
-export const OrderStatusBanner: React.FC = () => {
+interface OrderStatusBannerProps {
+  order?: KitchenOrder | null;
+}
+
+export const OrderStatusBanner: React.FC<OrderStatusBannerProps> = ({ order: propOrder }) => {
   const {
     activeOrderId,
     isOrderModalOpen,
@@ -13,7 +18,8 @@ export const OrderStatusBanner: React.FC = () => {
     setActiveOrderId,
   } = useMenuStore();
 
-  const { data: order } = useActiveClientOrder(activeOrderId);
+  const { data: hookOrder } = useActiveClientOrder(propOrder === undefined ? activeOrderId : null);
+  const order = propOrder !== undefined ? propOrder : hookOrder;
 
   if (!order || order.status === 'entregado') {
     return null;
@@ -41,8 +47,9 @@ export const OrderStatusBanner: React.FC = () => {
     label: 'En proceso',
   };
 
-  const currentTotal = currency === 'CRC' ? order.totalCRC : order.totalUSD;
-  const totalItemsCount = order.items.reduce((acc, i) => acc + i.quantity, 0);
+  const items = Array.isArray(order.items) ? order.items : [];
+  const currentTotal = currency === 'CRC' ? (order.totalCRC || 0) : (order.totalUSD || 0);
+  const totalItemsCount = items.reduce((acc, i) => acc + (i.quantity || 1), 0);
 
   const handleWhatsAppHelp = () => {
     const table = order.tableNumber || 'Mesa';
@@ -100,7 +107,7 @@ export const OrderStatusBanner: React.FC = () => {
 
           {/* Desglose de productos */}
           <div className="space-y-2 py-1 max-h-56 overflow-y-auto">
-            {order.items.map((item, idx) => (
+            {items.map((item, idx) => (
               <div key={idx} className="flex justify-between items-center py-1 border-b border-gray-50 last:border-none">
                 <span className="font-medium text-gray-800">
                   {item.quantity}× {item.name}

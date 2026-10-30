@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMenuStore } from './store/useMenuStore';
 import { useAuth } from './hooks/useAuth';
-import { useCategories, useDishes, useUpsertDish, useDeleteDish } from './hooks/useMenu';
+import { useCategories, useDishes, useUpsertDish, useDeleteDish, useActiveClientOrder } from './hooks/useMenu';
 import { TopHeader } from './components/layout/TopHeader';
 import { HomeHero } from './components/menu/HomeHero';
 import { DishCard } from './components/menu/DishCard';
@@ -24,7 +24,11 @@ export default function App() {
     setSelectedDish,
     exchangeRate,
     setExchangeRate,
+    activeOrderId,
   } = useMenuStore();
+
+  const { data: activeOrder } = useActiveClientOrder(activeOrderId);
+  const hasActiveOrder = Boolean(activeOrder && activeOrder.status !== 'entregado');
 
   const { isAuthenticated, signIn, signOut } = useAuth();
 
@@ -312,11 +316,12 @@ export default function App() {
 
         <CartDrawer />
 
-        <OrderStatusBanner />
+        <OrderStatusBanner order={activeOrder} />
 
         <FloatingBar
           isLargeView={isLargeView}
           onToggleLargeView={() => setIsLargeView(!isLargeView)}
+          hasActiveOrder={hasActiveOrder}
         />
       </main>
     </div>
