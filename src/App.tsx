@@ -15,7 +15,6 @@ import { KitchenDisplaySystem } from './components/admin/KitchenDisplaySystem';
 import { QrGenerator } from './components/admin/QrGenerator';
 import { DishTable } from './components/admin/DishTable';
 import { DishEditModal } from './components/admin/DishEditModal';
-import { Button } from './components/ui/Button';
 import type { Dish } from './types/database';
 
 export default function App() {
@@ -158,17 +157,18 @@ export default function App() {
                     />
                   </div>
 
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="bg-[#1C3F32] hover:bg-[#142e25] text-white rounded-2xl px-4 py-2.5 font-bold"
+                  <button
                     onClick={() => {
                       setEditingDish(null);
                       setIsEditModalOpen(true);
                     }}
+                    className="inline-flex items-center gap-2 bg-[#1C3F32] hover:bg-[#152e25] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xs transition-transform duration-100 active:scale-[0.98] border border-white/10"
                   >
-                    + Nuevo Platillo
-                  </Button>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Nuevo platillo</span>
+                  </button>
                 </div>
               </div>
 
