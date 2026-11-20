@@ -26,6 +26,7 @@ export default function App() {
     setExchangeRate,
     activeOrderId,
     activeOrder: storeActiveOrder,
+    setActiveOrderId,
     setActiveOrder,
   } = useMenuStore();
 
@@ -34,9 +35,19 @@ export default function App() {
   // Sincronizar store local cuando Supabase actualice el pedido en tiempo real
   useEffect(() => {
     if (remoteActiveOrder) {
-      setActiveOrder(remoteActiveOrder);
+      const isDelivered = remoteActiveOrder.status === 'entregado';
+      const isStale = remoteActiveOrder.createdAt
+        ? Date.now() - new Date(remoteActiveOrder.createdAt).getTime() > 6 * 60 * 60 * 1000
+        : false;
+
+      if (isDelivered || isStale) {
+        setActiveOrderId(null);
+        setActiveOrder(null);
+      } else {
+        setActiveOrder(remoteActiveOrder);
+      }
     }
-  }, [remoteActiveOrder, setActiveOrder]);
+  }, [remoteActiveOrder, setActiveOrder, setActiveOrderId]);
 
   const activeOrder = remoteActiveOrder || storeActiveOrder;
   const hasActiveOrder = Boolean(activeOrder && activeOrder.status !== 'entregado');

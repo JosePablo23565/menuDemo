@@ -14,8 +14,6 @@ export const OrderStatusBanner: React.FC<OrderStatusBannerProps> = ({ order: pro
     isOrderModalOpen,
     setIsOrderModalOpen,
     currency,
-    setActiveOrderId,
-    setActiveOrder,
   } = useMenuStore();
 
   const order = propOrder || storeOrder;
@@ -49,12 +47,6 @@ export const OrderStatusBanner: React.FC<OrderStatusBannerProps> = ({ order: pro
   const items = Array.isArray(order.items) ? order.items : [];
   const currentTotal = currency === 'CRC' ? (order.totalCRC || 0) : (order.totalUSD || 0);
   const totalItemsCount = items.reduce((acc, i) => acc + (i.quantity || 1), 0);
-
-  const handleWhatsAppHelp = () => {
-    const table = order.tableNumber || 'Mesa';
-    const text = encodeURIComponent(`¡Hola Casa Tamarindo! Quisiera consultar sobre el pedido de ${table}.`);
-    window.open(`https://wa.me/50660454528?text=${text}`, '_blank');
-  };
 
   return (
     <>
@@ -121,35 +113,12 @@ export const OrderStatusBanner: React.FC<OrderStatusBannerProps> = ({ order: pro
             <span>{formatPrice(currentTotal, currency)}</span>
           </div>
 
-          {/* Asistencia contextual por WhatsApp */}
-          <div className="pt-1">
-            <button
-              onClick={handleWhatsAppHelp}
-              className="w-full flex items-center justify-center gap-2 bg-[#1C3F32]/10 hover:bg-[#1C3F32]/15 active:scale-[0.99] text-[#1C3F32] py-2.5 px-4 rounded-xl font-semibold text-xs transition-all border border-[#1C3F32]/15"
-            >
-              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <span>Consultar al restaurante por WhatsApp</span>
-            </button>
-          </div>
-
-          <div className="pt-2 flex gap-2">
+          <div className="pt-3">
             <button
               onClick={() => setIsOrderModalOpen(false)}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-xl font-semibold transition-colors"
+              className="w-full bg-[#1C3F32] hover:bg-[#152e25] text-white py-3 rounded-xl font-semibold text-xs transition-colors"
             >
               Cerrar
-            </button>
-            <button
-              onClick={() => {
-                setActiveOrderId(null);
-                setActiveOrder(null);
-                setIsOrderModalOpen(false);
-              }}
-              className="text-gray-400 hover:text-red-600 px-3 py-2.5 text-[11px] font-medium"
-            >
-              Finalizar mesa
             </button>
           </div>
         </div>
