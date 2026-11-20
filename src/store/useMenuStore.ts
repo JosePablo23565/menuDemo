@@ -220,6 +220,7 @@ export const useMenuStore = create<MenuState>()(
         cart: state.cart,
         exchangeRate: state.exchangeRate,
         activeOrderId: state.activeOrderId,
+        activeOrder: state.activeOrder,
       }),
     }
   )

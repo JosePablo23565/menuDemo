@@ -1,6 +1,5 @@
 import React from 'react';
 import { useMenuStore } from '../../store/useMenuStore';
-import { useActiveClientOrder } from '../../hooks/useMenu';
 import { formatPrice } from '../../lib/utils';
 import { Modal } from '../ui/Modal';
 import type { KitchenOrder } from '../../types/database';
@@ -11,15 +10,15 @@ interface OrderStatusBannerProps {
 
 export const OrderStatusBanner: React.FC<OrderStatusBannerProps> = ({ order: propOrder }) => {
   const {
-    activeOrderId,
+    activeOrder: storeOrder,
     isOrderModalOpen,
     setIsOrderModalOpen,
     currency,
     setActiveOrderId,
+    setActiveOrder,
   } = useMenuStore();
 
-  const { data: hookOrder } = useActiveClientOrder(propOrder === undefined ? activeOrderId : null);
-  const order = propOrder !== undefined ? propOrder : hookOrder;
+  const order = propOrder || storeOrder;
 
   if (!order || order.status === 'entregado') {
     return null;
@@ -145,6 +144,7 @@ export const OrderStatusBanner: React.FC<OrderStatusBannerProps> = ({ order: pro
             <button
               onClick={() => {
                 setActiveOrderId(null);
+                setActiveOrder(null);
                 setIsOrderModalOpen(false);
               }}
               className="text-gray-400 hover:text-red-600 px-3 py-2.5 text-[11px] font-medium"

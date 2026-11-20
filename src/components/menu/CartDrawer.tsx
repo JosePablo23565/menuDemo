@@ -17,6 +17,7 @@ export const CartDrawer: React.FC = () => {
     addDiner,
     clearCart,
     setActiveOrderId,
+    setActiveOrder,
   } = useMenuStore();
 
   const [newDinerName, setNewDinerName] = useState('');
@@ -73,7 +74,17 @@ export const CartDrawer: React.FC = () => {
       });
 
       if (createdOrder?.id) {
+        const fullOrder = {
+          id: createdOrder.id,
+          tableNumber: createdOrder.table_number || tableName,
+          status: (createdOrder.status || 'nuevo') as any,
+          items: createdOrder.items || consolidatedItems,
+          totalCRC: Number(createdOrder.total_crc || totalCRC),
+          totalUSD: Number(createdOrder.total_usd || totalUSD),
+          createdAt: createdOrder.created_at || new Date().toISOString(),
+        };
         setActiveOrderId(createdOrder.id);
+        setActiveOrder(fullOrder);
       }
 
       setIsSuccess(true);

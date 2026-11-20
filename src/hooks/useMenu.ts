@@ -137,8 +137,19 @@ export function useCreateOrder() {
       if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      if (data?.id) {
+        queryClient.setQueryData(['active-order', data.id], {
+          id: data.id,
+          tableNumber: data.table_number,
+          status: data.status as OrderStatus,
+          items: data.items || [],
+          totalCRC: Number(data.total_crc || 0),
+          totalUSD: Number(data.total_usd || 0),
+          createdAt: data.created_at,
+        });
+      }
     },
   });
 }
@@ -205,8 +216,19 @@ export function useUpdateOrderStatus() {
       if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      if (data?.id) {
+        queryClient.setQueryData(['active-order', data.id], {
+          id: data.id,
+          tableNumber: data.table_number,
+          status: data.status as OrderStatus,
+          items: data.items || [],
+          totalCRC: Number(data.total_crc || 0),
+          totalUSD: Number(data.total_usd || 0),
+          createdAt: data.created_at,
+        });
+      }
     },
   });
 }
@@ -220,8 +242,9 @@ export function useDeleteOrder() {
       if (error) throw new Error(error.message);
       return orderId;
     },
-    onSuccess: () => {
+    onSuccess: (deletedId) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.removeQueries({ queryKey: ['active-order', deletedId] });
     },
   });
 }
@@ -262,7 +285,12 @@ export function useActiveClientOrder(orderId: string | null) {
         .eq('id', orderId)
         .single();
 
-      if (error || !data) return null;
+      if (error) {
+        console.warn('[useActiveClientOrder] Error al cargar orden activa:', error.message);
+        return null;
+      }
+
+      if (!data) return null;
 
       return {
         id: data.id,
